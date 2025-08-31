@@ -1,18 +1,16 @@
-# Use lightweight OpenJDK image
-FROM openjdk:17-jdk-slim
+# Use Java 21 instead of 17
+FROM openjdk:21-jdk-slim
 
-# Set working directory
 WORKDIR /app
 
-# Install wget and unzip
-RUN apt-get update && apt-get install -y wget unzip && rm -rf /var/lib/apt/lists/*
+# Install wget
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
-# Download OTP jar and graph.obj from external links
-# ⚠️ Replace these links with your actual SharePoint / Google Drive direct-download links
+# Download OTP JAR + graph.obj + config
 RUN wget -O otp.jar "https://github.com/opentripplanner/OpenTripPlanner/releases/download/v2.5.0/otp-2.5.0-shaded.jar" \
-    && wget -O graph.obj "https://cdpindia0-my.sharepoint.com/:u:/g/personal/dinesh_suthar_cdpindia_com/EdErpv3RHU1IhM6JwflIaUEBjy9uP_8QCOrv-nfbwwT3Ng?download=1"
-# Expose OTP default port
+ && wget -O graph.obj "https://cdpindia0-my.sharepoint.com/:u:/g/personal/dinesh_suthar_cdpindia_com/EdErpv3RHU1IhM6JwflIaUEBjy9uP_8QCOrv-nfbwwT3Ng?download=1" \
+ && wget -O router-config.json "https://prod-files-secure.s3.us-west-2.amazonaws.com/e85255dc-3fdc-4993-a9ee-b8b24ea96552/2132a2f7-99ee-4c41-83f8-6292078af596/router-config.json"
+
 EXPOSE 8080
 
-# Run OTP when container starts
 CMD ["java", "-Xmx2G", "-jar", "otp.jar", "--load", "/app", "--serve", "--port", "8080"]
