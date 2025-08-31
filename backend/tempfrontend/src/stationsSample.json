@@ -1,0 +1,6 @@
+[
+  {"id":"STN_1","name":"Mumbai Central","lat":"18.9695","lon":"72.8194"},
+  {"id":"STN_2","name":"CSMT","lat":"18.9402","lon":"72.8356"},
+  {"id":"STN_3","name":"Dadar","lat":"19.0188","lon":"72.8443"},
+  {"id":"STN_4","name":"Bandra","lat":"19.0544","lon":"72.8408"}
+]
