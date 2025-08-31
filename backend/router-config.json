@@ -1,0 +1,49 @@
+{
+    "routingDefaults": {
+        "timezone": "Asia/Kolkata"
+    },
+    "transitModes": ["RAIL", "SUBWAY", "BUS"],
+    "streetRoutingTimeout": 5,
+    "numberItineraries": 4,
+    "transferPenalty": 180,
+    "preferredRoutes": null,
+    "unpreferredRoutes": null,
+    "walkReluctance": 10.0,
+    "walkSpeed": 1.4,
+    "bikeSpeed": 4.1,
+    "carSpeed": 8.0,
+    "maxTransfers": 3,
+    "optimize": "QUICK",
+    "accessModes": "WALK",
+    "egressModes": "WALK",
+    "directModes": "WALK",
+    "transferSlack": 120,
+    "transitReluctance": 1.0,
+    "modeWeight": {
+      "RAIL": 1.0,
+      "SUBWAY": 2.0,
+      "BUS": 3.0,
+      "WALK": 4.0
+    },
+    "modePriorities": {
+      "RAIL": 1,
+      "SUBWAY": 2,
+      "BUS": 3,
+      "WALK": 4
+    },
+    "maxWalkDistance": 1000,
+    "useFlexService": false,
+    "routingRequestDefaults": {
+      "maxTransfers": 2,
+      "walkReluctance": 10.0,
+      "walkSpeed": 1.4,
+      "mode": "RAIL,SUBWAY,BUS",
+      "arriveBy": false,
+      "maxWalkDistance": 1000
+    },
+    "elevation": {
+      "enabled": false
+    }
+  }
+  
+
