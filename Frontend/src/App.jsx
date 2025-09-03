@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import TrainSearch from './Component/InputLayout.jsx'
+import RouteSuggestions from './Component/RoutesBox'
 import './App.css'
 
 function App() {
@@ -7,7 +7,7 @@ function App() {
 
   return (
     <>
-      <TrainSearch/>
+      <RouteSuggestions/>
     </>
   )
 }

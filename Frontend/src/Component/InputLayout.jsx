@@ -3,7 +3,7 @@ import { ArrowUpDown } from "lucide-react"; // swap icon
 import start from "../assets/start.png";
 import end from "../assets/end2.png";
 
-export default function TrainSearch() {
+export default function InputLayout() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
