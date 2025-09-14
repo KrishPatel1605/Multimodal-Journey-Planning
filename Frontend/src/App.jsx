@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import RouteSuggestions from './Component/RoutesBox'
+import InputLayout from './Component/InputLayout'
 import './App.css'
 
 function App() {
@@ -7,7 +8,7 @@ function App() {
 
   return (
     <>
-      <RouteSuggestions/>
+      <InputLayout/>
     </>
   )
 }

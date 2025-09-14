@@ -20,9 +20,7 @@ export default function InputLayout() {
     }
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          query
-        )}`
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ", Mumbai")}&format=json&addressdetails=1&limit=5`
       );
       const data = await res.json();
       setFn(data);
