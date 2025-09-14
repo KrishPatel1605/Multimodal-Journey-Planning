@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import RouteSuggestions from './Component/RoutesBox'
 import InputLayout from './Component/InputLayout'
+import AllRoute from './Component/AllRoute'
 import './App.css'
 
 function App() {
@@ -8,7 +9,7 @@ function App() {
 
   return (
     <>
-      <InputLayout/>
+      <AllRoute/>
     </>
   )
 }
