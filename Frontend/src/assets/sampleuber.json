@@ -1,0 +1,145 @@
+{
+    "requestParameters": {
+        "mode": "TRANSIT,WALK",
+        "fromPlace": "19.167714,72.9609469",
+        "toPlace": "19.1635755,72.9617696"
+    },
+    "plan": {
+        "itineraries": [
+            {
+                "duration": 626,
+                "startTime": 1758048834000,
+                "endTime": 1758049460000,
+                "walkTime": 626,
+                "transitTime": 0,
+                "waitingTime": 0,
+                "walkDistance": 802.71,
+                "walkLimitExceeded": false,
+                "generalizedCost": 1216,
+                "elevationLost": 0,
+                "elevationGained": 0,
+                "transfers": 0,
+                "fare": {
+                    "fare": {},
+                    "details": {}
+                },
+                "legs": [
+                    {
+                        "startTime": 1758048834000,
+                        "endTime": 1758049460000,
+                        "departureDelay": 0,
+                        "arrivalDelay": 0,
+                        "realTime": false,
+                        "distance": 802.71,
+                        "generalizedCost": 1216,
+                        "pathway": false,
+                        "mode": "UBER",
+                        "transitLeg": false,
+                        "route": "",
+                        "agencyTimeZoneOffset": 19800000,
+                        "interlineWithPreviousLeg": false,
+                        "from": {
+                            "name": "Origin",
+                            "lon": 72.9609469,
+                            "lat": 19.167714,
+                            "departure": 1758048834000,
+                            "vertexType": "NORMAL"
+                        },
+                        "to": {
+                            "name": "Destination",
+                            "lon": 72.9617696,
+                            "lat": 19.1635755,
+                            "arrival": 1758049460000,
+                            "vertexType": "NORMAL"
+                        },
+                        "legGeometry": {
+                            "points": "qu~sBadi|LiAg@Zo@Xo@Pe@Rm@HSPg@BIr@sALUjBeDj@eA`CtAlDrBdAp@hAr@pCdB",
+                            "length": 18
+                        },
+                        "steps": [
+                            {
+                                "distance": 45.64,
+                                "relativeDirection": "DEPART",
+                                "streetName": "V B Phadke Marg",
+                                "absoluteDirection": "NORTHEAST",
+                                "stayOn": false,
+                                "area": false,
+                                "bogusName": false,
+                                "lon": 72.9608197,
+                                "lat": 19.1677751,
+                                "elevation": "",
+                                "walkingBike": false
+                            },
+                            {
+                                "distance": 364.64,
+                                "relativeDirection": "RIGHT",
+                                "streetName": "road",
+                                "absoluteDirection": "SOUTHEAST",
+                                "stayOn": false,
+                                "area": false,
+                                "bogusName": true,
+                                "lon": 72.9610166,
+                                "lat": 19.168141,
+                                "elevation": "",
+                                "walkingBike": false
+                            },
+                            {
+                                "distance": 392.44,
+                                "relativeDirection": "RIGHT",
+                                "streetName": "Veer Savarkar Road",
+                                "absoluteDirection": "SOUTHWEST",
+                                "stayOn": false,
+                                "area": false,
+                                "bogusName": false,
+                                "lon": 72.9639708,
+                                "lat": 19.16643,
+                                "elevation": "",
+                                "walkingBike": false
+                            }
+                        ],
+                        "rentedBike": false,
+                        "walkingBike": false,
+                        "duration": 626,
+                        "fares": {
+                            "auto": 38,
+                            "car": 63,
+                            "moto": 27
+                        }
+                    }
+                ],
+                "tooSloped": false,
+                "arrivedAtDestinationWithRentedBicycle": false
+            }
+        ]
+    },
+    "metadata": {
+        "searchWindowUsed": 2400,
+        "nextDateTime": 1758051234000,
+        "prevDateTime": 1758046434000
+    },
+    "previousPageCursor": "MXxQUkVWSU9VU19QQUdFfDIwMjUtMDktMTZUMTU6NTM6NTRafHwzaHxTVFJFRVRfQU5EX0FSUklWQUxfVElNRXx8fHx8fA==",
+    "nextPageCursor": "MXxORVhUX1BBR0V8MjAyNS0wOS0xNlQxOTozMzo1NFp8fDNofFNUUkVFVF9BTkRfQVJSSVZBTF9USU1FfHx8fHx8",
+    "error": {
+        "id": 409,
+        "msg": "Origin is within a trivial distance of the destination.",
+        "message": "TOO_CLOSE"
+    },
+    "debugOutput": {
+        "precalculationTime": 379400,
+        "directStreetRouterTime": 268809000,
+        "transitRouterTime": 3810349700,
+        "filteringTime": 18477700,
+        "renderingTime": 8691100,
+        "totalTime": 4108633000,
+        "transitRouterTimes": {
+            "tripPatternFilterTime": 79540000,
+            "accessEgressTime": 3496457400,
+            "raptorSearchTime": 154264500,
+            "itineraryCreationTime": 72945900
+        }
+    },
+    "elevationMetadata": {
+        "ellipsoidToGeoidDifference": -68.68620900069344,
+        "geoidElevation": false
+    }
+}

@@ -10,7 +10,7 @@ function App() {
 
   return (
     <>
-      <MapLeaflet height="70vh" zoom={13} />
+      <AllRoute/>
     </>
   )
 }
