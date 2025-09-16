@@ -1,0 +1,1 @@
+java -Xmx2G -jar otp-2.5.0-shaded.jar --load --serve .
