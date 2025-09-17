@@ -57,7 +57,7 @@ export default function InputLayout() {
   };
 
   return (
-    <div className="w-full p-6 bg-white rounded-2xl ">
+    <div className="w-full bg-white rounded-2xl ">
       <div className="relative">
 
         {/* FROM Input */}
