@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 
 const formatTime = (ms) => {
+  if (!ms) return "--";
   const d = new Date(ms);
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
 const formatDuration = (seconds) => {
+  if (!seconds) return "--";
   const mins = Math.round(seconds / 60);
   return `${mins} min`;
 };
@@ -54,9 +56,10 @@ const JourneyList = ({ itineraries }) => {
 
             {/* Sections */}
             <div className="space-y-2">
-              {itinerary.legs.map((leg, lidx) => (
-                <JourneyLeg key={lidx} leg={leg} />
-              ))}
+              {Array.isArray(itinerary.legs) &&
+                itinerary.legs.map((leg, lidx) => (
+                  <JourneyLeg key={lidx} leg={leg} />
+                ))}
             </div>
           </div>
         ))}
@@ -79,6 +82,8 @@ const JourneyList = ({ itineraries }) => {
 const JourneyLeg = ({ leg }) => {
   const [open, setOpen] = useState(false);
 
+  if (!leg) return null; // safety check
+
   return (
     <div className="border rounded-xl bg-gray-50">
       {/* Section Header */}
@@ -97,10 +102,10 @@ const JourneyLeg = ({ leg }) => {
                   ? "#2563eb"
                   : leg.mode === "BUS"
                   ? "#059669"
-                  : "#6b7280",
+                  : "#6b7280", // gray for walk
             }}
           >
-            {leg.mode}
+            {leg.mode || "Unknown"}
           </span>
           <span className="text-sm text-gray-700">
             {formatDuration(leg.duration)}
@@ -111,15 +116,119 @@ const JourneyLeg = ({ leg }) => {
 
       {/* Expanded Info */}
       {open && (
-        <div className="px-3 pb-3 text-sm text-gray-600 border-t">
+        <div className="px-3 pb-3 text-sm text-gray-600 border-t space-y-2">
+          {/* Default From/To */}
           <p>
-            From: <span className="font-medium">{leg.from.name}</span>
+            From: <span className="font-medium">{leg.from?.name}</span>
           </p>
           <p>
-            To: <span className="font-medium">{leg.to.name}</span>
+            To: <span className="font-medium">{leg.to?.name}</span>
           </p>
-          {leg.route && (
-            <p className="italic text-gray-500 mt-1">Route: {leg.route}</p>
+          {leg.route && leg.mode !== "RAIL" && (
+            <p className="italic text-gray-500">Route: {leg.route}</p>
+          )}
+
+          {/* WALK details */}
+          {leg.mode === "WALK" && Array.isArray(leg.steps) && (
+            <div className="mt-2">
+              <p className="font-semibold text-gray-700 mb-1">
+                Walking Directions:
+              </p>
+              <ul className="list-disc list-inside space-y-1">
+                {leg.steps.map((step, sidx) => (
+                  <li key={sidx} className="text-gray-600 text-sm">
+                    {step.relativeDirection} on{" "}
+                    <span className="font-medium">{step.streetName}</span> for{" "}
+                    {Math.round(step.distance)}m
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* TRAIN details */}
+          {leg.mode === "RAIL" && (
+            <div className="mt-2">
+              {leg.startTime && leg.endTime && (
+                <p className="text-sm text-gray-600">
+                  Time:{" "}
+                  <span className="font-medium">
+                    {formatTime(leg.startTime)} → {formatTime(leg.endTime)}
+                  </span>
+                </p>
+              )}
+
+              <p className="font-semibold text-gray-700 mt-2">Train Details:</p>
+              <ul className="list-disc list-inside space-y-1">
+                {leg.agencyName && (
+                  <li>
+                    Operator:{" "}
+                    <span className="font-medium">{leg.agencyName}</span>
+                  </li>
+                )}
+                {leg.route && (
+                  <li>
+                    Line: <span className="font-medium">{leg.route}</span>
+                  </li>
+                )}
+                {leg.trip?.tripId && (
+                  <li>
+                    Trip ID: <span className="font-medium">{leg.trip.tripId}</span>
+                  </li>
+                )}
+                {leg.trip?.directionId !== undefined && (
+                  <li>
+                    Direction:{" "}
+                    <span className="font-medium">{leg.trip.directionId}</span>
+                  </li>
+                )}
+                {leg.headsign && (
+                  <li>
+                    Headsign: <span className="font-medium">{leg.headsign}</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
+
+          {/* UBER details */}
+          {leg.mode === "UBER" && leg.fares && (
+            <div className="mt-2">
+              <p className="font-semibold text-gray-700 mb-1">Uber Options:</p>
+              <ul className="list-disc list-inside space-y-1">
+                {leg.fares.auto && (
+                  <li>
+                    Auto: <span className="font-medium">₹{leg.fares.auto}</span>
+                  </li>
+                )}
+                {leg.fares.car && (
+                  <li>
+                    Car: <span className="font-medium">₹{leg.fares.car}</span>
+                  </li>
+                )}
+                {leg.fares.moto && (
+                  <li>
+                    Moto: <span className="font-medium">₹{leg.fares.moto}</span>
+                  </li>
+                )}
+              </ul>
+              {leg.distance && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Distance:{" "}
+                  <span className="font-medium">
+                    {(leg.distance / 1000).toFixed(2)} km
+                  </span>
+                </p>
+              )}
+              {leg.duration && (
+                <p className="text-sm text-gray-600">
+                  Estimated Time:{" "}
+                  <span className="font-medium">
+                    {formatDuration(leg.duration)}
+                  </span>
+                </p>
+              )}
+            </div>
           )}
         </div>
       )}
