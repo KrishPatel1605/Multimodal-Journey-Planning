@@ -22,9 +22,6 @@ function FitBounds({ bounds }) {
 
 const defaultCenter = [19.07599, 72.877655]; // fallback center
 
-<<<<<<< HEAD
-export default function MapLeaflet({ height = "100vh", zoom = 13 }) {
-=======
 // assign colors + emojis per mode
 const modeStyles = {
   WALK: { color: "gray", emoji: "🚶" },
@@ -38,7 +35,6 @@ const modeStyles = {
 };
 
 export default function MapLeaflet({ height = "500px", zoom = 13 }) {
->>>>>>> bad203db393bed0658f3502469f061ca2be9b2ed
   const [legs, setLegs] = useState([]);
 
   useEffect(() => {
@@ -82,17 +78,12 @@ export default function MapLeaflet({ height = "500px", zoom = 13 }) {
   const bounds = markers.map((m) => m.pos);
 
   return (
-<<<<<<< HEAD
-    <div style={{ width: "100%", height: "100%" }}>
-      <MapContainer center={defaultCenter} zoom={zoom} style={{ height: "100%", borderRadius: 12 }}>
-=======
     <div style={{ width: "100%", height }}>
       <MapContainer
         center={defaultCenter}
         zoom={zoom}
         style={{ height: "100%", borderRadius: 12 }}
       >
->>>>>>> bad203db393bed0658f3502469f061ca2be9b2ed
         <TileLayer
           attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
