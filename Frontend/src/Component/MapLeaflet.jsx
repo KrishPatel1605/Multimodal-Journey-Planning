@@ -22,7 +22,7 @@ function FitBounds({ bounds }) {
 
 const defaultCenter = [19.07599, 72.877655]; // fallback center
 
-export default function MapLeaflet({ height = "500px", zoom = 13 }) {
+export default function MapLeaflet({ height = "100vh", zoom = 13 }) {
   const [legs, setLegs] = useState([]);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function MapLeaflet({ height = "500px", zoom = 13 }) {
   const bounds = markers.map((m) => m.pos);
 
   return (
-    <div style={{ width: "100%", height }}>
+    <div style={{ width: "100%", height: "100%" }}>
       <MapContainer center={defaultCenter} zoom={zoom} style={{ height: "100%", borderRadius: 12 }}>
         <TileLayer
           attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
