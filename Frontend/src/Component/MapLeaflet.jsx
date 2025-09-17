@@ -9,7 +9,7 @@ import {
   useMap,
 } from "react-leaflet";
 import polyline from "polyline";
-import sampleData from "../assets/samplebus.json"; // adjust path if needed
+import sampleData from "../assets/sampleuber.json"; // adjust path if needed
 
 // optional helper to programmatically fit bounds
 function FitBounds({ bounds }) {
@@ -22,7 +22,23 @@ function FitBounds({ bounds }) {
 
 const defaultCenter = [19.07599, 72.877655]; // fallback center
 
+<<<<<<< HEAD
 export default function MapLeaflet({ height = "100vh", zoom = 13 }) {
+=======
+// assign colors + emojis per mode
+const modeStyles = {
+  WALK: { color: "gray", emoji: "🚶" },
+  BUS: { color: "orange", emoji: "🚌" },
+  RAIL: { color: "blue", emoji: "🚆" },
+  SUBWAY: { color: "purple", emoji: "🚇" },
+  TRAM: { color: "green", emoji: "🚋" },
+  UBER: { color: "black", emoji: "🚖" },
+  CAR: { color: "red", emoji: "🚗" },
+  DEFAULT: { color: "teal", emoji: "📍" },
+};
+
+export default function MapLeaflet({ height = "500px", zoom = 13 }) {
+>>>>>>> bad203db393bed0658f3502469f061ca2be9b2ed
   const [legs, setLegs] = useState([]);
 
   useEffect(() => {
@@ -33,27 +49,32 @@ export default function MapLeaflet({ height = "100vh", zoom = 13 }) {
     }
   }, []);
 
-  // markers: from + to of each leg
   const markers = [];
   const polylines = [];
 
   legs.forEach((leg, i) => {
+    const style = modeStyles[leg.mode] || modeStyles.DEFAULT;
+
+    // markers for from & to
     markers.push({
       id: `from-${i}`,
       pos: [leg.from.lat, leg.from.lon],
-      title: leg.from.name,
-      info: leg.mode + " start",
+      title: `${style.emoji} ${leg.from.name}`,
+      info: `${leg.mode} start`,
     });
     markers.push({
       id: `to-${i}`,
       pos: [leg.to.lat, leg.to.lon],
-      title: leg.to.name,
-      info: leg.mode + " end",
+      title: `${style.emoji} ${leg.to.name}`,
+      info: `${leg.mode} end`,
     });
 
+    // polyline
     if (leg.legGeometry?.points) {
-      const coords = polyline.decode(leg.legGeometry.points).map(([lat, lon]) => [lat, lon]);
-      polylines.push(coords);
+      const coords = polyline
+        .decode(leg.legGeometry.points)
+        .map(([lat, lon]) => [lat, lon]);
+      polylines.push({ coords, color: style.color });
     }
   });
 
@@ -61,8 +82,17 @@ export default function MapLeaflet({ height = "100vh", zoom = 13 }) {
   const bounds = markers.map((m) => m.pos);
 
   return (
+<<<<<<< HEAD
     <div style={{ width: "100%", height: "100%" }}>
       <MapContainer center={defaultCenter} zoom={zoom} style={{ height: "100%", borderRadius: 12 }}>
+=======
+    <div style={{ width: "100%", height }}>
+      <MapContainer
+        center={defaultCenter}
+        zoom={zoom}
+        style={{ height: "100%", borderRadius: 12 }}
+      >
+>>>>>>> bad203db393bed0658f3502469f061ca2be9b2ed
         <TileLayer
           attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -78,7 +108,7 @@ export default function MapLeaflet({ height = "100vh", zoom = 13 }) {
         ))}
 
         {polylines.map((line, idx) => (
-          <Polyline key={idx} positions={line} color="blue" />
+          <Polyline key={idx} positions={line.coords} color={line.color} />
         ))}
 
         <FitBounds bounds={bounds} />
