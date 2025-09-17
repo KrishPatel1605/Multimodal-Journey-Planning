@@ -1,6 +1,15 @@
 // MapLeaflet.jsx
-import React, { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
+import React, { useEffect, useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+  useMap,
+} from "react-leaflet";
+import polyline from "polyline";
+import sampleData from "../assets/samplebus.json"; // adjust path if needed
 
 // optional helper to programmatically fit bounds
 function FitBounds({ bounds }) {
@@ -11,16 +20,44 @@ function FitBounds({ bounds }) {
   return null;
 }
 
-const defaultCenter = [19.07599, 72.877655]; // Mumbai example
-const sampleMarkers = [
-  { id: 1, pos: [19.07599, 72.877655], title: "A", info: "Start point" },
-  { id: 2, pos: [19.080, 72.88], title: "B", info: "End point" },
-];
+const defaultCenter = [19.07599, 72.877655]; // fallback center
 
 export default function MapLeaflet({ height = "500px", zoom = 13 }) {
-  const [markers] = useState(sampleMarkers);
+  const [legs, setLegs] = useState([]);
 
-  // compute bounds from markers
+  useEffect(() => {
+    // extract route legs from OTP JSON
+    if (sampleData?.plan?.itineraries?.length) {
+      const itinerary = sampleData.plan.itineraries[0]; // pick first itinerary
+      setLegs(itinerary.legs || []);
+    }
+  }, []);
+
+  // markers: from + to of each leg
+  const markers = [];
+  const polylines = [];
+
+  legs.forEach((leg, i) => {
+    markers.push({
+      id: `from-${i}`,
+      pos: [leg.from.lat, leg.from.lon],
+      title: leg.from.name,
+      info: leg.mode + " start",
+    });
+    markers.push({
+      id: `to-${i}`,
+      pos: [leg.to.lat, leg.to.lon],
+      title: leg.to.name,
+      info: leg.mode + " end",
+    });
+
+    if (leg.legGeometry?.points) {
+      const coords = polyline.decode(leg.legGeometry.points).map(([lat, lon]) => [lat, lon]);
+      polylines.push(coords);
+    }
+  });
+
+  // bounds for fit
   const bounds = markers.map((m) => m.pos);
 
   return (
@@ -40,10 +77,10 @@ export default function MapLeaflet({ height = "500px", zoom = 13 }) {
           </Marker>
         ))}
 
-        {/* example polyline connecting markers */}
-        <Polyline positions={markers.map((m) => m.pos)} />
+        {polylines.map((line, idx) => (
+          <Polyline key={idx} positions={line} color="blue" />
+        ))}
 
-        {/* fit map to markers on first render */}
         <FitBounds bounds={bounds} />
       </MapContainer>
     </div>
