@@ -105,7 +105,8 @@ export default function InputLayout({ onSearch, loading }) {
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+    
+    <div className="w-full bg-white rounded-2xl p-6">
       <div className="relative">
         {/* FROM Input */}
         <div className="relative mb-4">
@@ -145,14 +146,15 @@ export default function InputLayout({ onSearch, loading }) {
         </div>
 
         {/* Swap Button */}
-        <div className="flex justify-center mb-4">
-          <button
-            onClick={handleSwap}
-            className="bg-green-100 rounded-full p-3 shadow-md transform transition-all duration-300 hover:rotate-180 hover:bg-green-200 hover:scale-110"
-          >
-            <ArrowUpDown className="h-5 w-5 text-green-600" />
-          </button>
-        </div>
+        {/* Swap Button Overlay */}
+        <button
+          onClick={handleSwap}
+          className="absolute right-3 top-1/2 -translate-y-1/2 bg-green-100 rounded-full p-3  z-30
+                    transform transition-all duration-300 hover:rotate-180 hover:bg-green-200 hover:scale-110"
+        >
+          <ArrowUpDown className="h-5 w-5 text-green-600" />
+        </button>
+
 
         {/* TO Input */}
         <div className="relative mb-6">
@@ -206,7 +208,7 @@ export default function InputLayout({ onSearch, loading }) {
         ) : (
           <>
             <Navigation className="h-5 w-5" />
-            <span>FIND ROUTES</span>
+            <span>FIND JOURNEYS</span>
           </>
         )}
       </button>
