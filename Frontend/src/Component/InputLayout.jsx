@@ -1,17 +1,26 @@
 import { useState } from "react";
-import { ArrowUpDown } from "lucide-react"; // swap icon
-import start from "../assets/start.png";
-import end from "../assets/end2.png";
+import { ArrowUpDown, Navigation, Loader2 } from "lucide-react";
 
-export default function InputLayout() {
+// Mock icons for start/end points since we don't have the image assets
+const StartIcon = () => (
+  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+    <div className="w-3 h-3 bg-white rounded-full"></div>
+  </div>
+);
+
+const EndIcon = () => (
+  <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+    <div className="w-3 h-3 bg-white rounded-full"></div>
+  </div>
+);
+
+export default function InputLayout({ onSearch, loading }) {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-
   const [fromSuggestions, setFromSuggestions] = useState([]);
   const [toSuggestions, setToSuggestions] = useState([]);
-
-  const [selectedFrom, setSelectedFrom] = useState(null); // ✅ New state
-  const [selectedTo, setSelectedTo] = useState(null);     // ✅ New state
+  const [selectedFrom, setSelectedFrom] = useState(null);
+  const [selectedTo, setSelectedTo] = useState(null);
 
   const fetchSuggestions = async (query, setFn) => {
     if (query.length < 3) {
@@ -32,7 +41,7 @@ export default function InputLayout() {
   const handleSwap = () => {
     setFrom(to);
     setTo(from);
-    setSelectedFrom(selectedTo); // ✅ swap coordinates
+    setSelectedFrom(selectedTo);
     setSelectedTo(selectedFrom);
     setFromSuggestions([]);
     setToSuggestions([]);
@@ -49,48 +58,45 @@ export default function InputLayout() {
       return;
     }
 
-    console.log("Searching paths from:", selectedFrom.display_name, "to:", selectedTo.display_name);
-    console.log("From coords:", selectedFrom.lat, selectedFrom.lon);
-    console.log("To coords:", selectedTo.lat, selectedTo.lon);
-
-    // 👉 Here you can call a routing API using selectedFrom.lat/lon and selectedTo.lat/lon
+    // Call the parent's onSearch function with the required format
+    onSearch({
+      start: { lat: parseFloat(selectedFrom.lat), lon: parseFloat(selectedFrom.lon) },
+      destination: { lat: parseFloat(selectedTo.lat), lon: parseFloat(selectedTo.lon) }
+    });
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl ">
+    <div className="w-full bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
       <div className="relative">
-
         {/* FROM Input */}
-        <div className="relative">
+        <div className="relative mb-4">
           <div className="flex items-center space-x-3">
-            <span className="text-gray-500">
-              <img src={start} className="w-8 h-8" alt="start" />
-            </span>
+            <StartIcon />
             <input
               type="text"
               value={from}
               onChange={(e) => {
                 setFrom(e.target.value);
-                setSelectedFrom(null); // ✅ clear previous selection
+                setSelectedFrom(null);
                 fetchSuggestions(e.target.value, setFromSuggestions);
               }}
-              className="flex-1 border border-gray-300 px-3 py-3 rounded-t-lg focus:outline-none focus:border-green-500"
+              className="flex-1 border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
               placeholder="Starting location"
             />
           </div>
 
           {/* FROM Suggestions Dropdown */}
           {fromSuggestions.length > 0 && (
-            <ul className="absolute left-11 right-0 bg-white border border-gray-300 rounded-b-md max-h-40 overflow-y-auto shadow z-10">
+            <ul className="absolute left-11 right-0 bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-lg z-20">
               {fromSuggestions.map((suggestion, index) => (
                 <li
                   key={index}
                   onClick={() => {
                     setFrom(suggestion.display_name);
-                    setSelectedFrom(suggestion); // ✅ save full suggestion
+                    setSelectedFrom(suggestion);
                     setFromSuggestions([]);
                   }}
-                  className="px-3 py-2 text-sm hover:bg-green-100 cursor-pointer"
+                  className="px-4 py-3 text-sm hover:bg-green-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                 >
                   {suggestion.display_name}
                 </li>
@@ -100,44 +106,44 @@ export default function InputLayout() {
         </div>
 
         {/* Swap Button */}
-        <button
-          onClick={handleSwap}
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-green-100 rounded-full p-3 shadow-2xl transform transition-transform duration-500 hover:rotate-[180deg] hover:bg-green-200 z-20"
-        >
-          <ArrowUpDown className="h-5 w-5 text-green-600" />
-        </button>
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={handleSwap}
+            className="bg-green-100 rounded-full p-3 shadow-md transform transition-all duration-300 hover:rotate-180 hover:bg-green-200 hover:scale-110"
+          >
+            <ArrowUpDown className="h-5 w-5 text-green-600" />
+          </button>
+        </div>
 
         {/* TO Input */}
-        <div className="relative">
+        <div className="relative mb-6">
           <div className="flex items-center space-x-3">
-            <span className="text-gray-500">
-              <img src={end} className="w-8 h-8" alt="end" />
-            </span>
+            <EndIcon />
             <input
               type="text"
               value={to}
               onChange={(e) => {
                 setTo(e.target.value);
-                setSelectedTo(null); // ✅ clear previous selection
+                setSelectedTo(null);
                 fetchSuggestions(e.target.value, setToSuggestions);
               }}
-              className="flex-1 border border-gray-300 px-3 py-3 rounded-b-lg focus:outline-none focus:border-green-500"
+              className="flex-1 border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
               placeholder="Destination"
             />
           </div>
 
           {/* TO Suggestions Dropdown */}
           {toSuggestions.length > 0 && (
-            <ul className="absolute left-11 right-0 bg-white border border-gray-300 rounded-b-md max-h-40 overflow-y-auto shadow z-10">
+            <ul className="absolute left-11 right-0 bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-lg z-20">
               {toSuggestions.map((suggestion, index) => (
                 <li
                   key={index}
                   onClick={() => {
                     setTo(suggestion.display_name);
-                    setSelectedTo(suggestion); // ✅ save full suggestion
+                    setSelectedTo(suggestion);
                     setToSuggestions([]);
                   }}
-                  className="px-3 py-2 text-sm hover:bg-green-100 cursor-pointer"
+                  className="px-4 py-3 text-sm hover:bg-green-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                 >
                   {suggestion.display_name}
                 </li>
@@ -150,9 +156,20 @@ export default function InputLayout() {
       {/* Search Button */}
       <button
         onClick={handleSearch}
-        className="w-full mt-10 bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition"
+        disabled={loading}
+        className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
       >
-        SEARCH PATHS
+        {loading ? (
+          <>
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>SEARCHING...</span>
+          </>
+        ) : (
+          <>
+            <Navigation className="h-5 w-5" />
+            <span>FIND ROUTES</span>
+          </>
+        )}
       </button>
     </div>
   );

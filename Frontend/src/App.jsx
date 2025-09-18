@@ -1,16 +1,13 @@
-import { useState } from 'react'
-import MainPage from './Pages/MainPage.jsx'
-import './App.css'
-import TransportApp from './Pages/TempPage.jsx'
+import React from 'react';
+import MainPage from './Pages/MainPage';
+import './App.css'; // If you have global styles
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <TransportApp />
-    </>
-  )
+    <div className="App">
+      <MainPage />
+    </div>
+  );
 }
 
-export default App
+export default App;
