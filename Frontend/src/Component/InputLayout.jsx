@@ -38,6 +38,29 @@ export default function InputLayout({ onSearch, loading }) {
     }
   };
 
+  const fetchCoordinatesForLocation = async (locationName) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName + ", Mumbai")}&format=json&addressdetails=1&limit=1`
+      );
+      const data = await res.json();
+      
+      if (data.length === 0) {
+        // Try without Mumbai if no results found
+        const resGlobal = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&addressdetails=1&limit=1`
+        );
+        const dataGlobal = await resGlobal.json();
+        return dataGlobal.length > 0 ? dataGlobal[0] : null;
+      }
+      
+      return data[0];
+    } catch (err) {
+      console.error("Error fetching coordinates:", err);
+      return null;
+    }
+  };
+
   const handleSwap = () => {
     setFrom(to);
     setTo(from);
@@ -47,21 +70,37 @@ export default function InputLayout({ onSearch, loading }) {
     setToSuggestions([]);
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!from || !to) {
       alert("Please enter both starting and destination locations");
       return;
     }
 
-    if (!selectedFrom || !selectedTo) {
-      alert("Please select valid locations from the suggestions");
-      return;
+    let startLocation = selectedFrom;
+    let destinationLocation = selectedTo;
+
+    // If from location wasn't selected from suggestions, fetch coordinates
+    if (!selectedFrom) {
+      startLocation = await fetchCoordinatesForLocation(from);
+      if (!startLocation) {
+        alert(`Invalid starting location: "${from}". Please check the spelling or try a different location.`);
+        return;
+      }
+    }
+
+    // If to location wasn't selected from suggestions, fetch coordinates
+    if (!selectedTo) {
+      destinationLocation = await fetchCoordinatesForLocation(to);
+      if (!destinationLocation) {
+        alert(`Invalid destination: "${to}". Please check the spelling or try a different location.`);
+        return;
+      }
     }
 
     // Call the parent's onSearch function with the required format
     onSearch({
-      start: { lat: parseFloat(selectedFrom.lat), lon: parseFloat(selectedFrom.lon) },
-      destination: { lat: parseFloat(selectedTo.lat), lon: parseFloat(selectedTo.lon) }
+      start: { lat: parseFloat(startLocation.lat), lon: parseFloat(startLocation.lon) },
+      destination: { lat: parseFloat(destinationLocation.lat), lon: parseFloat(destinationLocation.lon) }
     });
   };
 
