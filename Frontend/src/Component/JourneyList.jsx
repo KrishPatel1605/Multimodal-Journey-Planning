@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Clock, MapPin, Loader2, AlertCircle, Eye, Map } from "lucide-react";
+import { Clock, MapPin, Loader2, AlertCircle, Map } from "lucide-react";
 
 const formatTime = (ms) => {
   if (!ms) return "--";
@@ -57,7 +57,6 @@ const JourneyList = ({
     );
   }
 
-  // Slice itineraries: first 3 or all
   const visibleItineraries = showAll ? itineraries : itineraries.slice(0, 3);
 
   return (
@@ -66,11 +65,11 @@ const JourneyList = ({
       <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-100">
         <h1 className="text-center font-bold text-xl text-gray-800">Available Routes</h1>
         <p className="text-center text-sm text-gray-600 mt-1">
-          {itineraries.length} route{itineraries.length !== 1 ? 's' : ''} found
+          {itineraries.length} route{itineraries.length !== 1 ? "s" : ""} found
         </p>
-        
+
         {/* Show All Routes Button */}
-        {selectedRouteIndex !== -1 && onShowAllRoutes && (
+        {/* {selectedRouteIndex !== -1 && onShowAllRoutes && (
           <div className="mt-3 flex justify-center">
             <button
               onClick={onShowAllRoutes}
@@ -80,7 +79,7 @@ const JourneyList = ({
               <span>Show All Routes</span>
             </button>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Scrollable Card List */}
@@ -88,10 +87,11 @@ const JourneyList = ({
         {visibleItineraries.map((itinerary, idx) => (
           <div
             key={idx}
+            onClick={() => onRouteSelect && onRouteSelect(idx)} // whole card clickable
             className={`border rounded-2xl shadow-sm bg-white hover:shadow-md transition-all duration-200 cursor-pointer ${
-              selectedRouteIndex === idx 
-                ? 'border-blue-400 ring-2 ring-blue-100 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
+              selectedRouteIndex === idx
+                ? "border-blue-400 ring-2 ring-blue-100 bg-blue-50"
+                : "border-gray-200 hover:border-gray-300"
             }`}
           >
             {/* Card Header */}
@@ -113,26 +113,8 @@ const JourneyList = ({
                     </span>
                   </div>
                 </div>
-                <div className="flex flex-col items-end space-y-2">
-                  <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                    {formatDuration(itinerary.duration)}
-                  </div>
-                  {onRouteSelect && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRouteSelect(idx);
-                      }}
-                      className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                        selectedRouteIndex === idx
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      <Eye className="h-3 w-3" />
-                      <span>{selectedRouteIndex === idx ? 'Viewing' : 'View on Map'}</span>
-                    </button>
-                  )}
+                <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                  {formatDuration(itinerary.duration)}
                 </div>
               </div>
 
@@ -165,7 +147,7 @@ const JourneyList = ({
 const JourneyLeg = ({ leg }) => {
   const [open, setOpen] = useState(false);
 
-  if (!leg) return null; // safety check
+  if (!leg) return null;
 
   const getModeStyle = (mode) => {
     const styles = {
@@ -184,7 +166,10 @@ const JourneyLeg = ({ leg }) => {
     <div className="border border-gray-100 rounded-xl bg-gray-50 overflow-hidden">
       {/* Section Header */}
       <button
-        onClick={() => setOpen(!open)}
+        onClick={(e) => {
+          e.stopPropagation(); // prevent triggering card click
+          setOpen(!open);
+        }}
         className="w-full flex justify-between items-center px-4 py-3 hover:bg-gray-100 transition-colors"
       >
         <div className="flex items-center gap-3">
@@ -230,7 +215,10 @@ const JourneyLeg = ({ leg }) => {
                 <p className="font-semibold text-gray-800 mb-2">Walking Directions:</p>
                 <div className="space-y-1 max-h-32 overflow-y-auto">
                   {leg.steps.map((step, sidx) => (
-                    <div key={sidx} className="text-xs text-gray-600 pl-2 border-l-2 border-gray-200">
+                    <div
+                      key={sidx}
+                      className="text-xs text-gray-600 pl-2 border-l-2 border-gray-200"
+                    >
                       {step.relativeDirection} on{" "}
                       <span className="font-medium">{step.streetName}</span> for{" "}
                       {Math.round(step.distance)}m
@@ -255,19 +243,33 @@ const JourneyLeg = ({ leg }) => {
                 <p className="font-semibold text-gray-800">Train Details:</p>
                 <div className="grid grid-cols-1 gap-1 text-xs">
                   {leg.agencyName && (
-                    <p><span className="font-medium">Operator:</span> {leg.agencyName}</p>
+                    <p>
+                      <span className="font-medium">Operator:</span>{" "}
+                      {leg.agencyName}
+                    </p>
                   )}
                   {leg.route && (
-                    <p><span className="font-medium">Line:</span> {leg.route}</p>
+                    <p>
+                      <span className="font-medium">Line:</span> {leg.route}
+                    </p>
                   )}
                   {leg.trip?.tripId && (
-                    <p><span className="font-medium">Trip ID:</span> {leg.trip.tripId}</p>
+                    <p>
+                      <span className="font-medium">Trip ID:</span>{" "}
+                      {leg.trip.tripId}
+                    </p>
                   )}
                   {leg.trip?.directionId !== undefined && (
-                    <p><span className="font-medium">Direction:</span> {leg.trip.directionId}</p>
+                    <p>
+                      <span className="font-medium">Direction:</span>{" "}
+                      {leg.trip.directionId}
+                    </p>
                   )}
                   {leg.headsign && (
-                    <p><span className="font-medium">Headsign:</span> {leg.headsign}</p>
+                    <p>
+                      <span className="font-medium">Headsign:</span>{" "}
+                      {leg.headsign}
+                    </p>
                   )}
                 </div>
               </div>
