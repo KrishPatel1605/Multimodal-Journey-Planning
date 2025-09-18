@@ -106,7 +106,7 @@ export default function InputLayout({ onSearch, loading }) {
 
   return (
     
-    <div className="w-full bg-white rounded-2xl p-6">
+    <div className="w-full bg-white rounded-2xl ">
       <div className="relative">
         {/* FROM Input */}
         <div className="relative mb-4">

@@ -58,38 +58,38 @@ const MainPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 p-6 font-sans">
-      {/* Sidebar (Single Box) */}
-      <div className="flex flex-col h-full w-96 bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden">
-        {/* Input on top */}
-        <div className="border-b border-gray-200">
-          <InputLayout onSearch={handleSearch} loading={loading} />
-        </div>
-
-        {/* Journey List fills remaining space */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <JourneyList
-            itineraries={routes}
-            loading={loading}
-            error={error}
-            onRouteSelect={handleRouteSelect}
-            selectedRouteIndex={selectedRoute ? routes.indexOf(selectedRoute) : -1}
-            onShowAllRoutes={handleShowAllRoutes}
-          />
-        </div>
+  <div className="flex h-screen bg-gray-50 p-6 font-sans">
+    {/* Sidebar - 40% */}
+    <div className="flex flex-col h-full w-[40%] bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mr-6">
+      {/* Input on top */}
+      <div className="p-6 border-b border-gray-200">
+        <InputLayout onSearch={handleSearch} loading={loading} />
       </div>
 
-      {/* Map Area */}
-      <div className="flex-1 ml-6">
-        <MapLeaflet
-          height="100%"
-          zoom={12}
-          routes={selectedRoute ? [selectedRoute] : routes}
-          selectedRoute={selectedRoute}
-          showAllRoutes={!selectedRoute}
+      {/* Journey List fills remaining space */}
+      <div className="flex-1 overflow-y-auto p-6">
+        <JourneyList
+          itineraries={routes}
+          loading={loading}
+          error={error}
+          onRouteSelect={handleRouteSelect}
+          selectedRouteIndex={selectedRoute ? routes.indexOf(selectedRoute) : -1}
+          onShowAllRoutes={handleShowAllRoutes}
         />
       </div>
     </div>
+
+    {/* Map Area - 60% */}
+    <div className="w-[60%]">
+      <MapLeaflet
+        height="100%"
+        zoom={12}
+        routes={selectedRoute ? [selectedRoute] : routes}
+        selectedRoute={selectedRoute}
+        showAllRoutes={!selectedRoute}
+      />
+    </div>
+  </div>
   );
 };
 
