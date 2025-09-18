@@ -1,18 +1,9 @@
 import { useState } from "react";
 import { ArrowUpDown, Navigation, Loader2 } from "lucide-react";
 
-// Mock icons for start/end points since we don't have the image assets
-const StartIcon = () => (
-  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-    <div className="w-3 h-3 bg-white rounded-full"></div>
-  </div>
-);
-
-const EndIcon = () => (
-  <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-    <div className="w-3 h-3 bg-white rounded-full"></div>
-  </div>
-);
+// Importing images from src/assets
+import startIcon from "../images/start.png";
+import endIcon from "../images/end2.png";
 
 export default function InputLayout({ onSearch, loading }) {
   const [from, setFrom] = useState("");
@@ -29,7 +20,9 @@ export default function InputLayout({ onSearch, loading }) {
     }
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ", Mumbai")}&format=json&addressdetails=1&limit=5`
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          query + ", Mumbai"
+        )}&format=json&addressdetails=1&limit=5`
       );
       const data = await res.json();
       setFn(data);
@@ -41,19 +34,22 @@ export default function InputLayout({ onSearch, loading }) {
   const fetchCoordinatesForLocation = async (locationName) => {
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName + ", Mumbai")}&format=json&addressdetails=1&limit=1`
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          locationName + ", Mumbai"
+        )}&format=json&addressdetails=1&limit=1`
       );
       const data = await res.json();
-      
+
       if (data.length === 0) {
-        // Try without Mumbai if no results found
         const resGlobal = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&addressdetails=1&limit=1`
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+            locationName
+          )}&format=json&addressdetails=1&limit=1`
         );
         const dataGlobal = await resGlobal.json();
         return dataGlobal.length > 0 ? dataGlobal[0] : null;
       }
-      
+
       return data[0];
     } catch (err) {
       console.error("Error fetching coordinates:", err);
@@ -79,39 +75,45 @@ export default function InputLayout({ onSearch, loading }) {
     let startLocation = selectedFrom;
     let destinationLocation = selectedTo;
 
-    // If from location wasn't selected from suggestions, fetch coordinates
     if (!selectedFrom) {
       startLocation = await fetchCoordinatesForLocation(from);
       if (!startLocation) {
-        alert(`Invalid starting location: "${from}". Please check the spelling or try a different location.`);
+        alert(
+          `Invalid starting location: "${from}". Please check the spelling or try a different location.`
+        );
         return;
       }
     }
 
-    // If to location wasn't selected from suggestions, fetch coordinates
     if (!selectedTo) {
       destinationLocation = await fetchCoordinatesForLocation(to);
       if (!destinationLocation) {
-        alert(`Invalid destination: "${to}". Please check the spelling or try a different location.`);
+        alert(
+          `Invalid destination: "${to}". Please check the spelling or try a different location.`
+        );
         return;
       }
     }
 
-    // Call the parent's onSearch function with the required format
     onSearch({
-      start: { lat: parseFloat(startLocation.lat), lon: parseFloat(startLocation.lon) },
-      destination: { lat: parseFloat(destinationLocation.lat), lon: parseFloat(destinationLocation.lon) }
+      start: {
+        lat: parseFloat(startLocation.lat),
+        lon: parseFloat(startLocation.lon),
+      },
+      destination: {
+        lat: parseFloat(destinationLocation.lat),
+        lon: parseFloat(destinationLocation.lon),
+      },
     });
   };
 
   return (
-    
-    <div className="w-full bg-white rounded-2xl ">
+    <div className="w-full bg-white rounded-2xl">
       <div className="relative">
         {/* FROM Input */}
-        <div className="relative mb-4">
+        <div className="relative">
           <div className="flex items-center space-x-3">
-            <StartIcon />
+            <img src={startIcon} alt="Start" className="w-8 h-8" />
             <input
               type="text"
               value={from}
@@ -146,20 +148,18 @@ export default function InputLayout({ onSearch, loading }) {
         </div>
 
         {/* Swap Button */}
-        {/* Swap Button Overlay */}
         <button
           onClick={handleSwap}
-          className="absolute right-3 top-1/2 -translate-y-1/2 bg-green-100 rounded-full p-3  z-30
-                    transform transition-all duration-300 hover:rotate-180 hover:bg-green-200 hover:scale-110"
+          className="absolute right-3 top-1/2 -translate-y-1/2 bg-green-100 rounded-full p-3 z-30
+                     transform transition-all duration-300 hover:rotate-180 hover:bg-green-200 hover:scale-110"
         >
           <ArrowUpDown className="h-5 w-5 text-green-600" />
         </button>
 
-
         {/* TO Input */}
-        <div className="relative mb-6">
+        <div className="relative mb-6 mt-4">
           <div className="flex items-center space-x-3">
-            <EndIcon />
+            <img src={endIcon} alt="End" className="w-8 h-8" />
             <input
               type="text"
               value={to}

@@ -63,9 +63,9 @@ const JourneyList = ({
     <div className="w-full h-full flex flex-col">
       {/* Fixed Header */}
       <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-100">
-        <h1 className="text-center font-bold text-xl text-gray-800">Available Routes</h1>
+        <h1 className="text-center font-bold text-xl text-gray-800">Available Journey</h1>
         <p className="text-center text-sm text-gray-600 mt-1">
-          {itineraries.length} route{itineraries.length !== 1 ? "s" : ""} found
+          {itineraries.length} Journey{itineraries.length !== 1 ? "s" : ""} found
         </p>
 
         {/* Show All Routes Button */}

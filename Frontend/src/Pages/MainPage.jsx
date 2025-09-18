@@ -62,12 +62,12 @@ const MainPage = () => {
     {/* Sidebar - 40% */}
     <div className="flex flex-col h-full w-[40%] bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mr-6">
       {/* Input on top */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-3 border-b border-gray-200">
         <InputLayout onSearch={handleSearch} loading={loading} />
       </div>
 
       {/* Journey List fills remaining space */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-3 pt-2">
         <JourneyList
           itineraries={routes}
           loading={loading}
