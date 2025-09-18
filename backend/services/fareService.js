@@ -1,6 +1,5 @@
-// Fake distance/time calculator since we can’t use Google Maps API
+// Fake distance/time calculator (Haversine + avg speed)
 function getDistanceTime(pickup, destination) {
-  // Haversine formula for rough distance
   const toRad = (x) => (x * Math.PI) / 180;
   const R = 6371 * 1000; // meters
 
@@ -14,7 +13,10 @@ function getDistanceTime(pickup, destination) {
       Math.sin(dLon / 2) ** 2;
 
   const distance = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const duration = (distance / 15000) * 3600; // Assume avg 15 km/h
+
+  // Assume Uber avg speed ~ 30 km/h (≈ 8.3 m/s)
+  const avgUberSpeed = 8.3; // meters/sec
+  const duration = distance / avgUberSpeed;
 
   return {
     distance: { value: distance }, // in meters
@@ -29,7 +31,7 @@ export function calculateFare(pickup, destination) {
   const perKmRate = { auto: 10, car: 15, moto: 8 };
   const perMinuteRate = { auto: 2, car: 3, moto: 1.5 };
 
-  return {
+  const fare = {
     auto: Math.round(
       baseFare.auto +
         (distanceTime.distance.value / 1000) * perKmRate.auto +
@@ -45,5 +47,11 @@ export function calculateFare(pickup, destination) {
         (distanceTime.distance.value / 1000) * perKmRate.moto +
         (distanceTime.duration.value / 60) * perMinuteRate.moto
     ),
+  };
+
+  return {
+    ...fare,
+    distance: distanceTime.distance.value,
+    duration: distanceTime.duration.value, // seconds
   };
 }

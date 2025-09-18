@@ -9,19 +9,25 @@ export const getRoutes = async (req, res) => {
       return res.status(400).json({ error: "Start and destination are required" });
     }
 
-    // Fetch routes from OpenTripPlanner
     const otpResponse = await getOTPRoute(start, destination);
 
-    // Process routes → replace long walk with Uber + add fare
     const processedRoutes = otpResponse.plan.itineraries.map((itinerary) => {
       itinerary.legs = itinerary.legs.map((leg) => {
         if (leg.mode === "WALK" && leg.distance > 750) {
-          // Replace with Uber
-          leg.mode = "UBER";
-          leg.fares = calculateFare(
+          const uber = calculateFare(
             { lat: leg.from.lat, lon: leg.from.lon },
             { lat: leg.to.lat, lon: leg.to.lon }
           );
+
+          // Replace walk with Uber leg
+          leg.mode = "UBER";
+          leg.fares = {
+            auto: uber.auto,
+            car: uber.car,
+            moto: uber.moto,
+          };
+          leg.distance = uber.distance;
+          leg.duration = uber.duration; // ✅ Uber travel time
         }
         return leg;
       });
