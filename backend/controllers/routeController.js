@@ -3,13 +3,16 @@ import { calculateFare } from "../services/fareService.js";
 
 export const getRoutes = async (req, res) => {
   try {
-    const { start, destination } = req.body;
+    const { start, destination, transportModes = {} } = req.body;
 
     if (!start || !destination) {
-      return res.status(400).json({ error: "Start and destination are required" });
+      return res
+        .status(400)
+        .json({ error: "Start and destination are required" });
     }
 
-    const otpResponse = await getOTPRoute(start, destination);
+    // ✅ Pass transportModes safely to OTP service
+    const otpResponse = await getOTPRoute(start, destination, transportModes);
 
     const processedRoutes = otpResponse.plan.itineraries.map((itinerary) => {
       itinerary.legs = itinerary.legs.map((leg) => {

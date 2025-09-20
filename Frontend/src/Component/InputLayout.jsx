@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUpDown, Navigation, Loader2, MapPin } from "lucide-react";
+import { ArrowUpDown, Navigation, Loader2, MapPin, Train, Bus } from "lucide-react";
 
 import startIcon from "../images/start.png";
 import endIcon from "../images/end2.png";
@@ -12,6 +12,11 @@ export default function InputLayout({ onSearch, loading }) {
   const [selectedFrom, setSelectedFrom] = useState(null);
   const [selectedTo, setSelectedTo] = useState(null);
   const [gettingLocation, setGettingLocation] = useState(false);
+  
+  const [transportModes, setTransportModes] = useState({
+    rail: true,
+    bus: true
+  });
 
   const fetchSuggestions = async (query, setFn) => {
     if (query.length < 3) {
@@ -145,9 +150,30 @@ export default function InputLayout({ onSearch, loading }) {
     setToSuggestions([]);
   };
 
+  const handleTransportModeChange = (mode) => {
+    const newModes = {
+      ...transportModes,
+      [mode]: !transportModes[mode]
+    };
+    
+    const selectedCount = Object.values(newModes).filter(Boolean).length;
+    if (selectedCount === 0) {
+      alert("Please select at least one transportation mode.");
+      return;
+    }
+    
+    setTransportModes(newModes);
+  };
+
   const handleSearch = async () => {
     if (!from || !to) {
       alert("Please enter both starting and destination locations");
+      return;
+    }
+
+    const selectedModes = Object.values(transportModes).filter(Boolean);
+    if (selectedModes.length === 0) {
+      alert("Please select at least one transportation mode");
       return;
     }
 
@@ -183,6 +209,7 @@ export default function InputLayout({ onSearch, loading }) {
         lat: parseFloat(destinationLocation.lat),
         lon: parseFloat(destinationLocation.lon),
       },
+      transportModes: transportModes
     });
   };
 
@@ -301,6 +328,33 @@ export default function InputLayout({ onSearch, loading }) {
               ))}
             </ul>
           )}
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="text-sm font-medium text-gray-700 mb-3">Transportation Modes</h3>
+        <div className="flex space-x-6">
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={transportModes.rail}
+              onChange={() => handleTransportModeChange('rail')}
+              className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+            />
+            <Train className="h-4 w-4 text-gray-600" />
+            <span className="text-sm text-gray-700">Rail</span>
+          </label>
+          
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={transportModes.bus}
+              onChange={() => handleTransportModeChange('bus')}
+              className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+            />
+            <Bus className="h-4 w-4 text-gray-600" />
+            <span className="text-sm text-gray-700">Bus</span>
+          </label>
         </div>
       </div>
 

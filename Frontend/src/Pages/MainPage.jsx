@@ -17,12 +17,18 @@ const MainPage = () => {
     try {
       console.log("Sending search request:", searchData);
 
+      const requestPayload = {
+        start: searchData.start,
+        destination: searchData.destination,
+        transportModes: searchData.transportModes
+      };
+
       const response = await fetch("http://localhost:5000/api/routes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(searchData),
+        body: JSON.stringify(requestPayload),
       });
 
       if (!response.ok) {
@@ -36,7 +42,7 @@ const MainPage = () => {
         setRoutes(data.plan.itineraries);
       } else {
         setRoutes([]);
-        setError("No routes found for the selected locations");
+        setError("No routes found for the selected locations and transport modes");
       }
     } catch (err) {
       console.error("Error fetching routes:", err);
@@ -58,34 +64,34 @@ const MainPage = () => {
   };
 
   return (
-  <div className="flex h-screen bg-gray-50 p-6 font-sans">
-    <div className="flex flex-col h-full w-[40%] bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mr-6">
-      <div className="p-3 border-b border-gray-200">
-        <InputLayout onSearch={handleSearch} loading={loading} />
+    <div className="flex h-screen bg-gray-50 p-6 font-sans">
+      <div className="flex flex-col h-full w-[40%] bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mr-6">
+        <div className="p-3 border-b border-gray-200">
+          <InputLayout onSearch={handleSearch} loading={loading} />
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-3 pt-2">
+          <JourneyList
+            itineraries={routes}
+            loading={loading}
+            error={error}
+            onRouteSelect={handleRouteSelect}
+            selectedRouteIndex={selectedRoute ? routes.indexOf(selectedRoute) : -1}
+            onShowAllRoutes={handleShowAllRoutes}
+          />
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 pt-2">
-        <JourneyList
-          itineraries={routes}
-          loading={loading}
-          error={error}
-          onRouteSelect={handleRouteSelect}
-          selectedRouteIndex={selectedRoute ? routes.indexOf(selectedRoute) : -1}
-          onShowAllRoutes={handleShowAllRoutes}
+      <div className="w-[60%]">
+        <MapLeaflet
+          height="100%"
+          zoom={12}
+          routes={selectedRoute ? [selectedRoute] : routes}
+          selectedRoute={selectedRoute}
+          showAllRoutes={!selectedRoute}
         />
       </div>
     </div>
-
-    <div className="w-[60%]">
-      <MapLeaflet
-        height="100%"
-        zoom={12}
-        routes={selectedRoute ? [selectedRoute] : routes}
-        selectedRoute={selectedRoute}
-        showAllRoutes={!selectedRoute}
-      />
-    </div>
-  </div>
   );
 };
 
