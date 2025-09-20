@@ -186,6 +186,26 @@ export default function InputLayout({ onSearch, loading }) {
     });
   };
 
+  const handleKeyDown = (e, field) => {
+    if (e.key === 'Enter') {
+      if (field === 'from') {
+        setFromSuggestions([]);
+      } else {
+        setToSuggestions([]);
+      }
+      
+      if (from && to) {
+        handleSearch();
+      }
+    } else if (e.key === 'Escape') {
+      if (field === 'from') {
+        setFromSuggestions([]);
+      } else {
+        setToSuggestions([]);
+      }
+    }
+  };
+
   return (
     <div className="w-full bg-white rounded-2xl">
       <div className="relative">
@@ -201,6 +221,7 @@ export default function InputLayout({ onSearch, loading }) {
                   setSelectedFrom(null);
                   fetchSuggestions(e.target.value, setFromSuggestions);
                 }}
+                onKeyDown={(e) => handleKeyDown(e, 'from')}
                 className="flex-1 border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
                 placeholder="Starting location"
               />
@@ -257,6 +278,7 @@ export default function InputLayout({ onSearch, loading }) {
                 setSelectedTo(null);
                 fetchSuggestions(e.target.value, setToSuggestions);
               }}
+              onKeyDown={(e) => handleKeyDown(e, 'to')}
               className="flex-1 border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
               placeholder="Destination"
             />
