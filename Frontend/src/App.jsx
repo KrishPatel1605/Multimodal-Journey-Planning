@@ -1,6 +1,6 @@
 import React from 'react';
 import MainPage from './Pages/MainPage';
-import './App.css'; // If you have global styles
+import './App.css';
 
 function App() {
   return (

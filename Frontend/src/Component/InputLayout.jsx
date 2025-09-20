@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ArrowUpDown, Navigation, Loader2 } from "lucide-react";
 
-// Importing images from src/assets
 import startIcon from "../images/start.png";
 import endIcon from "../images/end2.png";
 
@@ -110,7 +109,6 @@ export default function InputLayout({ onSearch, loading }) {
   return (
     <div className="w-full bg-white rounded-2xl">
       <div className="relative">
-        {/* FROM Input */}
         <div className="relative">
           <div className="flex items-center space-x-3">
             <img src={startIcon} alt="Start" className="w-8 h-8" />
@@ -127,7 +125,6 @@ export default function InputLayout({ onSearch, loading }) {
             />
           </div>
 
-          {/* FROM Suggestions Dropdown */}
           {fromSuggestions.length > 0 && (
             <ul className="absolute left-11 right-0 bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-lg z-20">
               {fromSuggestions.map((suggestion, index) => (
@@ -147,7 +144,6 @@ export default function InputLayout({ onSearch, loading }) {
           )}
         </div>
 
-        {/* Swap Button */}
         <button
           onClick={handleSwap}
           className="absolute right-3 top-1/2 -translate-y-1/2 bg-green-100 rounded-full p-3 z-30
@@ -156,7 +152,6 @@ export default function InputLayout({ onSearch, loading }) {
           <ArrowUpDown className="h-5 w-5 text-green-600" />
         </button>
 
-        {/* TO Input */}
         <div className="relative mb-6 mt-4">
           <div className="flex items-center space-x-3">
             <img src={endIcon} alt="End" className="w-8 h-8" />
@@ -173,7 +168,6 @@ export default function InputLayout({ onSearch, loading }) {
             />
           </div>
 
-          {/* TO Suggestions Dropdown */}
           {toSuggestions.length > 0 && (
             <ul className="absolute left-11 right-0 bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-lg z-20">
               {toSuggestions.map((suggestion, index) => (
@@ -194,7 +188,6 @@ export default function InputLayout({ onSearch, loading }) {
         </div>
       </div>
 
-      {/* Search Button */}
       <button
         onClick={handleSearch}
         disabled={loading}

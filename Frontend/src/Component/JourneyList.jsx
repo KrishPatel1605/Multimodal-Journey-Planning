@@ -13,10 +13,10 @@ const formatDuration = (seconds) => {
   return `${mins} min`;
 };
 
-const JourneyList = ({ 
-  itineraries, 
-  loading, 
-  error, 
+const JourneyList = ({
+  itineraries,
+  loading,
+  error,
   onRouteSelect,
   selectedRouteIndex = -1,
   onShowAllRoutes
@@ -61,40 +61,23 @@ const JourneyList = ({
 
   return (
     <div className="w-full h-full flex flex-col">
-      {/* Fixed Header */}
       <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-100">
         <h1 className="text-center font-bold text-xl text-gray-800">Available Journey</h1>
         <p className="text-center text-sm text-gray-600 mt-1">
           {itineraries.length} Journey{itineraries.length !== 1 ? "s" : ""} found
         </p>
-
-        {/* Show All Routes Button */}
-        {/* {selectedRouteIndex !== -1 && onShowAllRoutes && (
-          <div className="mt-3 flex justify-center">
-            <button
-              onClick={onShowAllRoutes}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
-            >
-              <Map className="h-4 w-4" />
-              <span>Show All Routes</span>
-            </button>
-          </div>
-        )} */}
       </div>
 
-      {/* Scrollable Card List */}
       <div className="flex-1 overflow-y-auto space-y-4 mt-4 pr-1">
         {visibleItineraries.map((itinerary, idx) => (
           <div
             key={idx}
             onClick={() => onRouteSelect && onRouteSelect(idx)} // whole card clickable
-            className={`border rounded-2xl shadow-sm bg-white hover:shadow-md transition-all duration-200 cursor-pointer ${
-              selectedRouteIndex === idx
+            className={`border rounded-2xl shadow-sm bg-white hover:shadow-md transition-all duration-200 cursor-pointer ${selectedRouteIndex === idx
                 ? "border-blue-400 ring-2 ring-blue-100 bg-blue-50"
                 : "border-gray-200 hover:border-gray-300"
-            }`}
+              }`}
           >
-            {/* Card Header */}
             <div className="p-5">
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -118,7 +101,6 @@ const JourneyList = ({
                 </div>
               </div>
 
-              {/* Sections */}
               <div className="space-y-3">
                 {Array.isArray(itinerary.legs) &&
                   itinerary.legs.map((leg, lidx) => (
@@ -129,7 +111,6 @@ const JourneyList = ({
           </div>
         ))}
 
-        {/* Show More Button */}
         {!showAll && itineraries.length > 3 && (
           <button
             onClick={() => setShowAll(true)}
@@ -164,10 +145,9 @@ const JourneyLeg = ({ leg }) => {
 
   return (
     <div className="border border-gray-100 rounded-xl bg-gray-50 overflow-hidden">
-      {/* Section Header */}
       <button
         onClick={(e) => {
-          e.stopPropagation(); // prevent triggering card click
+          e.stopPropagation();
           setOpen(!open);
         }}
         className="w-full flex justify-between items-center px-4 py-3 hover:bg-gray-100 transition-colors"
@@ -189,11 +169,9 @@ const JourneyLeg = ({ leg }) => {
         </span>
       </button>
 
-      {/* Expanded Info */}
       {open && (
         <div className="px-4 pb-4 text-sm text-gray-600 border-t border-gray-200 bg-white">
           <div className="pt-4 space-y-3">
-            {/* Default From/To */}
             <div className="grid grid-cols-1 gap-2">
               <p className="flex justify-between">
                 <span className="font-medium text-gray-700">From:</span>
@@ -209,7 +187,6 @@ const JourneyLeg = ({ leg }) => {
               <p className="italic text-gray-500">Route: {leg.route}</p>
             )}
 
-            {/* WALK details */}
             {leg.mode === "WALK" && Array.isArray(leg.steps) && (
               <div className="mt-4">
                 <p className="font-semibold text-gray-800 mb-2">Walking Directions:</p>
@@ -228,7 +205,6 @@ const JourneyLeg = ({ leg }) => {
               </div>
             )}
 
-            {/* TRAIN details */}
             {leg.mode === "RAIL" && (
               <div className="mt-4 space-y-2">
                 {leg.startTime && leg.endTime && (
@@ -275,7 +251,6 @@ const JourneyLeg = ({ leg }) => {
               </div>
             )}
 
-            {/* UBER details */}
             {leg.mode === "UBER" && leg.fares && (
               <div className="mt-4">
                 <p className="font-semibold text-gray-800 mb-2">Ride Options:</p>

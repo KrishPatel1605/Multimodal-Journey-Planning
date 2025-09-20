@@ -12,7 +12,7 @@ const MainPage = () => {
   const handleSearch = async (searchData) => {
     setLoading(true);
     setError(null);
-    setSelectedRoute(null); // Reset selected route on new search
+    setSelectedRoute(null);
     
     try {
       console.log("Sending search request:", searchData);
@@ -59,14 +59,11 @@ const MainPage = () => {
 
   return (
   <div className="flex h-screen bg-gray-50 p-6 font-sans">
-    {/* Sidebar - 40% */}
     <div className="flex flex-col h-full w-[40%] bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mr-6">
-      {/* Input on top */}
       <div className="p-3 border-b border-gray-200">
         <InputLayout onSearch={handleSearch} loading={loading} />
       </div>
 
-      {/* Journey List fills remaining space */}
       <div className="flex-1 overflow-y-auto p-3 pt-2">
         <JourneyList
           itineraries={routes}
@@ -79,7 +76,6 @@ const MainPage = () => {
       </div>
     </div>
 
-    {/* Map Area - 60% */}
     <div className="w-[60%]">
       <MapLeaflet
         height="100%"

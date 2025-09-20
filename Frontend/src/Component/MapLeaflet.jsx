@@ -9,7 +9,6 @@ import {
 } from "react-leaflet";
 import polyline from "polyline";
 
-// optional helper to programmatically fit bounds
 function FitBounds({ bounds }) {
   const map = useMap();
   useEffect(() => {
@@ -20,9 +19,8 @@ function FitBounds({ bounds }) {
   return null;
 }
 
-const defaultCenter = [19.07599, 72.877655]; // Mumbai fallback center
+const defaultCenter = [19.07599, 72.877655];
 
-// assign colors + emojis per mode
 const modeStyles = {
   WALK: { color: "#6b7280", emoji: "🚶" },
   BUS: { color: "#f97316", emoji: "🚌" },
@@ -34,7 +32,6 @@ const modeStyles = {
   DEFAULT: { color: "#0891b2", emoji: "📍" },
 };
 
-// Simple placeholder map component when no Leaflet is available
 const PlaceholderMap = ({ routes, height, selectedRoute, showAllRoutes }) => {
   const displayText = selectedRoute 
     ? "Showing selected route details"
@@ -102,19 +99,17 @@ export default function MapLeaflet({
   const [isLeafletAvailable, setIsLeafletAvailable] = useState(true);
 
   useEffect(() => {
-    // Check if we're in a browser environment and if Leaflet dependencies are available
     if (typeof window === 'undefined') {
       setIsLeafletAvailable(false);
       return;
     }
 
-    // Priority: selectedRoute > routeData > routes array
     let targetRoute = null;
     
     if (selectedRoute) {
       targetRoute = selectedRoute;
     } else if (routeData?.plan?.itineraries?.length) {
-      targetRoute = routeData.plan.itineraries[0]; // pick first itinerary
+      targetRoute = routeData.plan.itineraries[0];
     } else if (showAllRoutes && routes && routes.length > 0 && routes[0].legs) {
       targetRoute = routes[0];
     }
@@ -126,7 +121,6 @@ export default function MapLeaflet({
     }
   }, [routeData, routes, selectedRoute, showAllRoutes]);
 
-  // If Leaflet is not available or we're in SSR, show placeholder
   if (!isLeafletAvailable) {
     return (
       <PlaceholderMap 
@@ -145,7 +139,6 @@ export default function MapLeaflet({
     legs.forEach((leg, i) => {
       const style = modeStyles[leg.mode] || modeStyles.DEFAULT;
 
-      // Enhanced styling for selected route
       const enhancedStyle = selectedRoute ? {
         ...style,
         weight: 6,
@@ -156,7 +149,6 @@ export default function MapLeaflet({
         opacity: 0.8
       };
 
-      // markers for from & to
       if (leg.from && leg.from.lat && leg.from.lon) {
         markers.push({
           id: `from-${i}`,
@@ -177,7 +169,6 @@ export default function MapLeaflet({
         });
       }
 
-      // polyline
       if (leg.legGeometry?.points) {
         try {
           const coords = polyline
@@ -196,12 +187,10 @@ export default function MapLeaflet({
       }
     });
 
-    // bounds for fit
     const bounds = markers.length > 0 ? markers.map((m) => m.pos) : null;
 
     return (
       <div style={{ width: "100%", height }} className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 relative">
-        {/* Route Info Overlay */}
         {selectedRoute && (
           <div className="absolute top-4 left-4 z-[1000] bg-white rounded-lg shadow-md p-3 max-w-xs">
             <div className="text-sm">

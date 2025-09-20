@@ -19,7 +19,6 @@ export const getRoutes = async (req, res) => {
             { lat: leg.to.lat, lon: leg.to.lon }
           );
 
-          // Replace walk with Uber leg
           leg.mode = "UBER";
           leg.fares = {
             auto: uber.auto,
@@ -27,7 +26,7 @@ export const getRoutes = async (req, res) => {
             moto: uber.moto,
           };
           leg.distance = uber.distance;
-          leg.duration = uber.duration; // ✅ Uber travel time
+          leg.duration = uber.duration;
         }
         return leg;
       });
