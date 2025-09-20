@@ -71,9 +71,9 @@ const PlaceholderMap = ({ routes, height, selectedRoute, showAllRoutes }) => {
       {routes && routes.length > 0 && (
         <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-md p-3">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span>🏁</span>
             <span>Start</span>
-            <div className="w-3 h-3 bg-red-500 rounded-full ml-4"></div>
+            <span className="ml-4">🎯</span>
             <span>End</span>
           </div>
           {selectedRoute && (
@@ -121,6 +121,11 @@ export default function MapLeaflet({
     }
   }, [routeData, routes, selectedRoute, showAllRoutes]);
 
+  const getUniqueModesFromLegs = (legs) => {
+    const modes = legs.map(leg => leg.mode).filter(Boolean);
+    return [...new Set(modes)];
+  };
+
   if (!isLeafletAvailable) {
     return (
       <PlaceholderMap 
@@ -156,6 +161,7 @@ export default function MapLeaflet({
           title: `${style.emoji} ${leg.from.name}`,
           info: `${leg.mode} start`,
           isStart: i === 0,
+          mode: leg.mode,
         });
       }
       
@@ -166,6 +172,7 @@ export default function MapLeaflet({
           title: `${style.emoji} ${leg.to.name}`,
           info: `${leg.mode} end`,
           isEnd: i === legs.length - 1,
+          mode: leg.mode,
         });
       }
 
@@ -176,10 +183,11 @@ export default function MapLeaflet({
             .map(([lat, lon]) => [lat, lon]);
           polylines.push({ 
             coords, 
-            color: enhancedStyle.color, 
-            weight: enhancedStyle.weight, 
-            opacity: enhancedStyle.opacity,
-            mode: leg.mode 
+            color: style.color,
+            weight: selectedRoute ? 5 : 4,
+            opacity: selectedRoute ? 0.9 : 0.8,
+            mode: leg.mode,
+            emoji: style.emoji
           });
         } catch (error) {
           console.warn('Error decoding polyline:', error);
@@ -188,6 +196,7 @@ export default function MapLeaflet({
     });
 
     const bounds = markers.length > 0 ? markers.map((m) => m.pos) : null;
+    const uniqueModes = getUniqueModesFromLegs(legs);
 
     return (
       <div style={{ width: "100%", height }} className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 relative">
@@ -195,12 +204,20 @@ export default function MapLeaflet({
           <div className="absolute top-4 left-4 z-[1000] bg-white rounded-lg shadow-md p-3 max-w-xs">
             <div className="text-sm">
               <div className="flex items-center space-x-2 mb-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span>📍</span>
                 <span className="font-semibold text-gray-800">Selected Route</span>
               </div>
               <div className="text-xs text-gray-600">
                 <p>Duration: {Math.round(selectedRoute.duration / 60)} min</p>
-                <p>Modes: {selectedRoute.legs?.map(leg => leg.mode).join(' → ')}</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <span>Modes:</span>
+                  {uniqueModes.map((mode, idx) => (
+                    <span key={mode}>
+                      {modeStyles[mode]?.emoji || modeStyles.DEFAULT.emoji}
+                      {idx < uniqueModes.length - 1 && <span className="mx-1">→</span>}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -222,8 +239,8 @@ export default function MapLeaflet({
                 <div className="text-center">
                   <strong className="text-gray-800">{m.title}</strong>
                   <div className="text-sm text-gray-600 mt-1">{m.info}</div>
-                  {m.isStart && <div className="text-xs text-green-600 mt-1">🚩 Journey Start</div>}
-                  {m.isEnd && <div className="text-xs text-red-600 mt-1">🏁 Journey End</div>}
+                  {m.isStart && <div className="text-xs text-green-600 mt-1">🏁 Journey Start</div>}
+                  {m.isEnd && <div className="text-xs text-red-600 mt-1">🎯 Journey End</div>}
                 </div>
               </Popup>
             </Marker>
@@ -231,16 +248,49 @@ export default function MapLeaflet({
 
           {polylines.map((line, idx) => (
             <Polyline 
-              key={idx} 
+              key={`${line.mode}-${idx}`} 
               positions={line.coords} 
               color={line.color}
-              weight={line.weight}
-              opacity={line.opacity}
+              weight={line.weight || 4}
+              opacity={line.opacity || 0.8}
+              dashArray={line.mode === 'WALK' ? '5, 10' : undefined} // Dashed line for walking
             />
           ))}
 
           {bounds && <FitBounds bounds={bounds} />}
         </MapContainer>
+
+        {legs.length > 0 && (
+          <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-md p-3">
+            <div className="text-xs font-medium text-gray-700 mb-2">Transport Modes</div>
+            <div className="flex flex-wrap items-center gap-2">
+              {uniqueModes.map((mode) => {
+                const style = modeStyles[mode] || modeStyles.DEFAULT;
+                return (
+                  <div key={mode} className="flex items-center space-x-1 text-xs">
+                    <span className="text-base">{style.emoji}</span>
+                    <div 
+                      className="w-4 h-2 rounded"
+                      style={{ backgroundColor: style.color }}
+                      title={`${mode} route color`}
+                    ></div>
+                    <span className="text-gray-600 capitalize">{mode.toLowerCase()}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-2 pt-2 border-t border-gray-200 flex items-center justify-between text-xs text-gray-600">
+              <div className="flex items-center space-x-1">
+                <span>🏁</span>
+                <span>Start</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <span>🎯</span>
+                <span>End</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   } catch (error) {
