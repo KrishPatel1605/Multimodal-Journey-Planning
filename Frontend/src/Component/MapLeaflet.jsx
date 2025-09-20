@@ -126,6 +126,10 @@ export default function MapLeaflet({
     return [...new Set(modes)];
   };
 
+  const getModeSequence = (legs) => {
+    return legs.map(leg => leg.mode).filter(Boolean);
+  };
+
   if (!isLeafletAvailable) {
     return (
       <PlaceholderMap 
@@ -197,6 +201,7 @@ export default function MapLeaflet({
 
     const bounds = markers.length > 0 ? markers.map((m) => m.pos) : null;
     const uniqueModes = getUniqueModesFromLegs(legs);
+    const modeSequence = getModeSequence(legs);
 
     return (
       <div style={{ width: "100%", height }} className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 relative">
@@ -211,10 +216,10 @@ export default function MapLeaflet({
                 <p>Duration: {Math.round(selectedRoute.duration / 60)} min</p>
                 <div className="flex items-center space-x-1 mt-1">
                   <span>Modes:</span>
-                  {uniqueModes.map((mode, idx) => (
-                    <span key={mode}>
+                  {modeSequence.map((mode, idx) => (
+                    <span key={`${mode}-${idx}`}>
                       {modeStyles[mode]?.emoji || modeStyles.DEFAULT.emoji}
-                      {idx < uniqueModes.length - 1 && <span className="mx-1">→</span>}
+                      {idx < modeSequence.length - 1 && <span className="mx-1">→</span>}
                     </span>
                   ))}
                 </div>
