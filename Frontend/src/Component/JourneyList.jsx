@@ -72,7 +72,7 @@ const JourneyList = ({
         {visibleItineraries.map((itinerary, idx) => (
           <div
             key={idx}
-            onClick={() => onRouteSelect && onRouteSelect(idx)} // whole card clickable
+            onClick={() => onRouteSelect && onRouteSelect(idx)}
             className={`border rounded-2xl shadow-sm bg-white hover:shadow-md transition-all duration-200 cursor-pointer ${selectedRouteIndex === idx
                 ? "border-blue-400 ring-2 ring-blue-100 bg-blue-50"
                 : "border-gray-200 hover:border-gray-300"
@@ -124,7 +124,6 @@ const JourneyList = ({
   );
 };
 
-// Section for each leg
 const JourneyLeg = ({ leg }) => {
   const [open, setOpen] = useState(false);
 

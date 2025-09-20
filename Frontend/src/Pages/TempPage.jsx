@@ -14,7 +14,6 @@ import {
   Zap
 } from "lucide-react";
 
-// Sample data - in a real app, this would be imported from your assets
 const sampleTrainData = {
   "plan": {
     "itineraries": [
@@ -86,7 +85,6 @@ const sampleTrainData = {
   }
 };
 
-// Enhanced Input Layout Component
 const InputLayout = ({ onSearch }) => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -129,7 +127,6 @@ const InputLayout = ({ onSearch }) => {
 
     setIsSearching(true);
     
-    // Simulate API call delay
     setTimeout(() => {
       onSearch(sampleTrainData.plan.itineraries);
       setIsSearching(false);
@@ -147,7 +144,6 @@ const InputLayout = ({ onSearch }) => {
       </div>
 
       <div className="relative">
-        {/* FROM Input */}
         <div className="relative mb-4">
           <div className="flex items-center space-x-4 group">
             <div className="w-4 h-4 bg-green-500 rounded-full shadow-lg group-focus-within:scale-110 transition-transform"></div>
@@ -183,7 +179,6 @@ const InputLayout = ({ onSearch }) => {
           )}
         </div>
 
-        {/* Swap Button */}
         <div className="flex justify-center relative z-20 -my-2">
           <button
             onClick={handleSwap}
@@ -193,7 +188,6 @@ const InputLayout = ({ onSearch }) => {
           </button>
         </div>
 
-        {/* TO Input */}
         <div className="relative mt-4">
           <div className="flex items-center space-x-4 group">
             <div className="w-4 h-4 bg-red-500 rounded-full shadow-lg group-focus-within:scale-110 transition-transform"></div>
@@ -230,7 +224,6 @@ const InputLayout = ({ onSearch }) => {
         </div>
       </div>
 
-      {/* Search Button */}
       <button
         onClick={handleSearch}
         disabled={isSearching}
@@ -252,7 +245,6 @@ const InputLayout = ({ onSearch }) => {
   );
 };
 
-// Utility functions
 const formatTime = (ms) => {
   if (!ms) return "--";
   const d = new Date(ms);
@@ -290,7 +282,6 @@ const getModeColor = (mode) => {
   }
 };
 
-// Enhanced Journey List Component
 const JourneyList = ({ itineraries, isLoading }) => {
   const [showAll, setShowAll] = useState(false);
 
@@ -326,7 +317,6 @@ const JourneyList = ({ itineraries, isLoading }) => {
 
   return (
     <div className="w-full h-full flex flex-col bg-gradient-to-br from-blue-50 to-purple-50">
-      {/* Enhanced Header */}
       <div className="sticky top-0 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 text-white z-10 px-6 py-5 shadow-xl">
         <div className="flex items-center gap-3 mb-2">
           <Zap className="w-6 h-6 text-yellow-300" />
@@ -337,7 +327,6 @@ const JourneyList = ({ itineraries, isLoading }) => {
         </p>
       </div>
 
-      {/* Scrollable Card List */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
         {visibleItineraries.map((itinerary, idx) => (
           <RouteCard key={idx} itinerary={itinerary} index={idx} />
@@ -358,11 +347,9 @@ const JourneyList = ({ itineraries, isLoading }) => {
   );
 };
 
-// Enhanced Route Card Component
 const RouteCard = ({ itinerary, index }) => {
   return (
     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
-      {/* Card Header */}
       <div className="bg-gradient-to-r from-white to-gray-50 p-6 border-b border-gray-100">
         <div className="flex justify-between items-start">
           <div className="flex-1">
@@ -392,7 +379,6 @@ const RouteCard = ({ itinerary, index }) => {
         </div>
       </div>
 
-      {/* Journey Legs */}
       <div className="p-6 space-y-4">
         {Array.isArray(itinerary.legs) &&
           itinerary.legs.map((leg, lidx) => (
@@ -403,7 +389,6 @@ const RouteCard = ({ itinerary, index }) => {
   );
 };
 
-// Enhanced Journey Leg Component
 const JourneyLeg = ({ leg, isLast }) => {
   const [open, setOpen] = useState(false);
 
@@ -412,7 +397,6 @@ const JourneyLeg = ({ leg, isLast }) => {
   return (
     <div className={`border-l-4 ${!isLast ? 'border-gray-200' : 'border-transparent'} ${!isLast ? 'pb-4' : ''}`}>
       <div className="bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-200">
-        {/* Section Header */}
         <button
           onClick={() => setOpen(!open)}
           className="w-full flex justify-between items-center p-5"
@@ -434,11 +418,9 @@ const JourneyLeg = ({ leg, isLast }) => {
           )}
         </button>
 
-        {/* Expanded Info */}
         {open && (
           <div className="px-5 pb-5 border-t border-gray-200 bg-white">
             <div className="pt-5 space-y-5">
-              {/* From/To with enhanced design */}
               <div className="flex items-start gap-4">
                 <div className="flex flex-col items-center">
                   <div className="w-4 h-4 bg-gradient-to-r from-green-400 to-green-600 rounded-full shadow-lg"></div>
@@ -457,7 +439,6 @@ const JourneyLeg = ({ leg, isLast }) => {
                 </div>
               </div>
 
-              {/* Mode-specific details with enhanced styling */}
               {leg.mode === "WALK" && Array.isArray(leg.steps) && (
                 <div className="bg-gradient-to-r from-green-50 to-green-100 p-5 rounded-xl border border-green-200">
                   <div className="flex items-center gap-3 mb-4">
@@ -568,7 +549,6 @@ const JourneyLeg = ({ leg, isLast }) => {
   );
 };
 
-// Simple Map Placeholder (since we can't import the actual Leaflet map)
 const MapPlaceholder = ({ itineraries }) => {
   return (
     <div className="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-gray-300">
@@ -586,7 +566,6 @@ const MapPlaceholder = ({ itineraries }) => {
   );
 };
 
-// Main App Component
 const TransportApp = () => {
   const [itineraries, setItineraries] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -601,20 +580,16 @@ const TransportApp = () => {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6 font-sans">
-      {/* Sidebar */}
       <div className="flex flex-col gap-6 h-full w-1/3 max-w-md">
-        {/* Input Section */}
         <div className="flex-shrink-0">
           <InputLayout onSearch={handleSearch} />
         </div>
         
-        {/* Results Section */}
         <div className="flex-1 rounded-2xl overflow-hidden shadow-xl">
           <JourneyList itineraries={itineraries} isLoading={isLoading} />
         </div>
       </div>
 
-      {/* Map Area */}
       <div className="flex-1 ml-6 bg-white rounded-2xl shadow-xl border border-gray-200 p-4">
         <MapPlaceholder itineraries={itineraries} />
       </div>
