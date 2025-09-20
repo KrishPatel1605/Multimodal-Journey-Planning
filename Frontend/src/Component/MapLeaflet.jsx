@@ -206,7 +206,7 @@ export default function MapLeaflet({
     return (
       <div style={{ width: "100%", height }} className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 relative">
         {selectedRoute && (
-          <div className="absolute top-4 left-4 z-[1000] bg-white rounded-lg shadow-md p-3 max-w-xs">
+          <div className="absolute top-4 left-16 z-[1000] bg-white rounded-lg shadow-md p-3 max-w-xs">
             <div className="text-sm">
               <div className="flex items-center space-x-2 mb-2">
                 <span>📍</span>
