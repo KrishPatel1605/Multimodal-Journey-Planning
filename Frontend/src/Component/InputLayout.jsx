@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUpDown, Navigation, Loader2 } from "lucide-react";
+import { ArrowUpDown, Navigation, Loader2, MapPin } from "lucide-react";
 
 import startIcon from "../images/start.png";
 import endIcon from "../images/end2.png";
@@ -11,6 +11,7 @@ export default function InputLayout({ onSearch, loading }) {
   const [toSuggestions, setToSuggestions] = useState([]);
   const [selectedFrom, setSelectedFrom] = useState(null);
   const [selectedTo, setSelectedTo] = useState(null);
+  const [gettingLocation, setGettingLocation] = useState(false);
 
   const fetchSuggestions = async (query, setFn) => {
     if (query.length < 3) {
@@ -54,6 +55,85 @@ export default function InputLayout({ onSearch, loading }) {
       console.error("Error fetching coordinates:", err);
       return null;
     }
+  };
+
+  const reverseGeocode = async (lat, lon) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1`
+      );
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      console.error("Error reverse geocoding:", err);
+      return null;
+    }
+  };
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    setGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        try {
+          const locationData = await reverseGeocode(latitude, longitude);
+          if (locationData) {
+            setFrom(locationData.display_name);
+            setSelectedFrom({
+              ...locationData,
+              lat: latitude.toString(),
+              lon: longitude.toString()
+            });
+            setFromSuggestions([]);
+          } else {
+            setFrom("Current Location");
+            setSelectedFrom({
+              display_name: "Current Location",
+              lat: latitude.toString(),
+              lon: longitude.toString()
+            });
+          }
+        } catch (err) {
+          console.error("Error getting location details:", err);
+          setFrom("Current Location");
+          setSelectedFrom({
+            display_name: "Current Location",
+            lat: latitude.toString(),
+            lon: longitude.toString()
+          });
+        }
+        
+        setGettingLocation(false);
+      },
+      (error) => {
+        setGettingLocation(false);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            alert("Location access denied by user.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            alert("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            alert("Location request timed out.");
+            break;
+          default:
+            alert("An unknown error occurred while getting location.");
+            break;
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
   };
 
   const handleSwap = () => {
@@ -112,17 +192,31 @@ export default function InputLayout({ onSearch, loading }) {
         <div className="relative">
           <div className="flex items-center space-x-3">
             <img src={startIcon} alt="Start" className="w-8 h-8" />
-            <input
-              type="text"
-              value={from}
-              onChange={(e) => {
-                setFrom(e.target.value);
-                setSelectedFrom(null);
-                fetchSuggestions(e.target.value, setFromSuggestions);
-              }}
-              className="flex-1 border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
-              placeholder="Starting location"
-            />
+            <div className="flex-1 flex space-x-2">
+              <input
+                type="text"
+                value={from}
+                onChange={(e) => {
+                  setFrom(e.target.value);
+                  setSelectedFrom(null);
+                  fetchSuggestions(e.target.value, setFromSuggestions);
+                }}
+                className="flex-1 border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
+                placeholder="Starting location"
+              />
+              <button
+                onClick={getCurrentLocation}
+                disabled={gettingLocation}
+                className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-3 py-3 rounded-lg transition-all duration-200 flex items-center justify-center min-w-[44px]"
+                title="Use current location"
+              >
+                {gettingLocation ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <MapPin className="h-4 w-4" />
+                )}
+              </button>
+            </div>
           </div>
 
           {fromSuggestions.length > 0 && (
