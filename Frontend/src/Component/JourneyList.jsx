@@ -30,7 +30,6 @@ const JourneyList = ({
   const sortOptions = {
     'recommended': 'Recommended',
     'duration-asc': 'Shortest Time',
-    'duration-desc': 'Longest Time',
     'transfers-asc': 'Fewest Transfers',
   };
 
@@ -44,8 +43,6 @@ const JourneyList = ({
       switch (sortCriteria) {
         case 'duration-asc':
           return (a.duration || 0) - (b.duration || 0);
-        case 'duration-desc':
-          return (b.duration || 0) - (a.duration || 0);
         case 'transfers-asc':
           const transfersA = (a.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1;
           const transfersB = (b.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1;

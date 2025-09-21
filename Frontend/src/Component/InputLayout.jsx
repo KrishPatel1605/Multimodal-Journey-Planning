@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowUpDown, Navigation, Loader2, MapPin, Train, Bus } from "lucide-react";
+import { ArrowUpDown, Navigation, Loader2, MapPin, Train, Bus, Check } from "lucide-react";
 
 const startIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2hmPSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMzNEQzOUUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTBjMCA3LTkgMTMtOSAxM3MtOS02LTktMTNhOSw5IDAgMCAxIDE4LDB6Ij48L3BhdGg+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMCIgcj0iMyIgZmlsbD0iIzM0RDM5RSI+PC9jaXJjbGU+PC9zdmc+";
 const endIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2hmPSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNFRjQ0NDQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTBjMCA3LTkgMTMtOSAxM3MtOS02LTktMTNhOSw5IDAgMCAxIDE4LDB6Ij48L3BhdGg+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMCIgcj0iMyIgZmlsbD0iI0VGNDQ0NCI+PC9jaXJjbGU+PC9zdmc+";
@@ -322,7 +322,7 @@ export default function InputLayout({ onSearch, loading }) {
       <div className="flex items-center justify-center gap-4 mb-6">
         <button 
           onClick={() => handleTransportModeChange('bus')}
-          className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border rounded-full transition-colors ${
+          className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border rounded-full transition-colors relative ${
             transportModes.bus 
             ? 'bg-green-600 text-white border-green-600' 
             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
@@ -330,10 +330,13 @@ export default function InputLayout({ onSearch, loading }) {
         >
           <Bus className="h-4 w-4" />
           <span>Bus</span>
+          {transportModes.bus && (
+            <Check className="h-4 w-4 ml-1" />
+          )}
         </button>
         <button 
           onClick={() => handleTransportModeChange('rail')}
-          className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border rounded-full transition-colors ${
+          className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border rounded-full transition-colors relative ${
             transportModes.rail 
             ? 'bg-green-600 text-white border-green-600' 
             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
@@ -341,6 +344,9 @@ export default function InputLayout({ onSearch, loading }) {
         >
           <Train className="h-4 w-4" />
           <span>Train</span>
+          {transportModes.rail && (
+            <Check className="h-4 w-4 ml-1" />
+          )}
         </button>
       </div>
 
