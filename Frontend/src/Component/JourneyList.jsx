@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Clock, MapPin, Loader2, AlertCircle, ChevronDown, Check } from "lucide-react";
+import { Clock, MapPin, Loader2, AlertCircle, ChevronDown, Check, Search } from "lucide-react";
 
 const formatTime = (ms) => {
   if (!ms) return "--";
@@ -19,7 +19,8 @@ const JourneyList = ({
   error,
   onRouteSelect,
   selectedRouteIndex = -1,
-  onShowAllRoutes
+  onShowAllRoutes,
+  hasSearched = false
 }) => {
   const [showAll, setShowAll] = useState(false);
   const [sortCriteria, setSortCriteria] = useState('recommended');
@@ -91,8 +92,22 @@ const JourneyList = ({
     return (
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-center text-gray-500">
-          <MapPin className="h-8 w-8 mx-auto mb-4" />
-          <p>Enter locations to find routes</p>
+          {hasSearched ? (
+            <>
+              <Search className="h-8 w-8 mx-auto mb-4" />
+              <p className="font-medium text-lg mb-2">No routes available</p>
+              <p className="text-sm">
+                No transit routes found between the selected locations.
+                <br />
+                Try adjusting your departure time or locations.
+              </p>
+            </>
+          ) : (
+            <>
+              <MapPin className="h-8 w-8 mx-auto mb-4" />
+              <p>Enter locations to find routes</p>
+            </>
+          )}
         </div>
       </div>
     );

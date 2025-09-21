@@ -8,11 +8,13 @@ const MainPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedRoute, setSelectedRoute] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearch = async (searchData) => {
     setLoading(true);
     setError(null);
     setSelectedRoute(null);
+    setHasSearched(true);
     
     try {
       console.log("Sending search request:", searchData);
@@ -63,6 +65,13 @@ const MainPage = () => {
     setSelectedRoute(null);
   };
 
+  const handleResetSearch = () => {
+    setRoutes([]);
+    setError(null);
+    setSelectedRoute(null);
+    setHasSearched(false);
+  };
+
   return (
     <div className="flex h-screen bg-gray-50 p-6 font-sans">
       <div className="flex flex-col h-full w-[60%] bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mr-6">
@@ -72,12 +81,12 @@ const MainPage = () => {
 
         <div className="flex-1 overflow-y-auto p-3 pt-2">
           <MapLeaflet
-          height="100%"
-          zoom={12}
-          routes={selectedRoute ? [selectedRoute] : routes}
-          selectedRoute={selectedRoute}
-          showAllRoutes={!selectedRoute}
-        />
+            height="100%"
+            zoom={12}
+            routes={selectedRoute ? [selectedRoute] : routes}
+            selectedRoute={selectedRoute}
+            showAllRoutes={!selectedRoute}
+          />
         </div>
       </div>
 
@@ -89,6 +98,7 @@ const MainPage = () => {
           onRouteSelect={handleRouteSelect}
           selectedRouteIndex={selectedRoute ? routes.indexOf(selectedRoute) : -1}
           onShowAllRoutes={handleShowAllRoutes}
+          hasSearched={hasSearched}
         />
       </div>
     </div>

@@ -14,7 +14,7 @@ export const getRoutes = async (req, res) => {
     const otpResponse = await getOTPRoute(start, destination, transportModes);
 
     const processedRoutes = otpResponse.plan.itineraries.map((itinerary) => {
-      // Process legs
+
       itinerary.legs = itinerary.legs.map((leg) => {
         if (leg.mode === "WALK" && leg.distance > 750) {
           const uber = calculateFare(
@@ -29,12 +29,11 @@ export const getRoutes = async (req, res) => {
             moto: uber.moto,
           };
           leg.distance = uber.distance;
-          leg.duration = uber.duration; // ✅ replace walk duration
+          leg.duration = uber.duration;
         }
         return leg;
       });
 
-      // ✅ Recalculate itinerary total duration
       itinerary.duration = itinerary.legs.reduce(
         (total, leg) => total + leg.duration,
         0
