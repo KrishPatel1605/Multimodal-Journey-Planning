@@ -1,0 +1,14 @@
+{
+  "backend": {
+    "path": "./backend",
+    "start": "npm run dev"
+  },
+  "Frontend": {
+    "path": "./Frontend",
+    "start": "npm run dev"
+  },
+  "otp": {
+    "path": "./backend/otp",
+    "start": "java -Xmx2G -jar otp-2.5.0-shaded.jar --load --serve ."
+  }
+}
