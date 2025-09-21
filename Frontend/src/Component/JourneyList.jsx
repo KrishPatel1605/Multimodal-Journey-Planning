@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Clock, MapPin, Loader2, AlertCircle, Map } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Clock, MapPin, Loader2, AlertCircle, ChevronDown, Check } from "lucide-react";
 
 const formatTime = (ms) => {
   if (!ms) return "--";
@@ -22,6 +22,47 @@ const JourneyList = ({
   onShowAllRoutes
 }) => {
   const [showAll, setShowAll] = useState(false);
+  const [sortCriteria, setSortCriteria] = useState('recommended');
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [sortedItineraries, setSortedItineraries] = useState([]);
+
+  const sortOptions = {
+    'recommended': 'Recommended',
+    'duration-asc': 'Shortest Time',
+    'duration-desc': 'Longest Time',
+    'transfers-asc': 'Fewest Transfers',
+  };
+
+  useEffect(() => {
+    if (!itineraries || itineraries.length === 0) {
+      setSortedItineraries([]);
+      return;
+    }
+
+    const sorted = [...itineraries].sort((a, b) => {
+      switch (sortCriteria) {
+        case 'duration-asc':
+          return (a.duration || 0) - (b.duration || 0);
+        case 'duration-desc':
+          return (b.duration || 0) - (a.duration || 0);
+        case 'transfers-asc':
+          const transfersA = (a.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1;
+          const transfersB = (b.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1;
+          return Math.max(0, transfersA) - Math.max(0, transfersB);
+        case 'recommended':
+        default:
+          const scoreA = (a.duration || 0) / 60 + ((a.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1) * 5;
+          const scoreB = (b.duration || 0) / 60 + ((b.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1) * 5;
+          return scoreA - scoreB;
+      }
+    });
+
+    setSortedItineraries(sorted);
+  }, [itineraries, sortCriteria]);
+
+  const handleReset = () => {
+    setSortCriteria('recommended');
+  };
 
   if (loading) {
     return (
@@ -46,7 +87,7 @@ const JourneyList = ({
     );
   }
 
-  if (!itineraries || itineraries.length === 0) {
+  if (!sortedItineraries || sortedItineraries.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-center text-gray-500">
@@ -57,66 +98,116 @@ const JourneyList = ({
     );
   }
 
-  const visibleItineraries = showAll ? itineraries : itineraries.slice(0, 3);
+  const visibleItineraries = showAll ? sortedItineraries : sortedItineraries.slice(0, 3);
 
   return (
     <div className="w-full h-full flex flex-col">
       <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-100">
-        <h1 className="text-center font-bold text-xl text-gray-800">Available Journey</h1>
+        <h1 className="text-center font-bold text-xl text-gray-800">Available Journeys</h1>
         <p className="text-center text-sm text-gray-600 mt-1">
-          {itineraries.length} Journey{itineraries.length !== 1 ? "s" : ""} found
+          {sortedItineraries.length} Journey{sortedItineraries.length !== 1 ? "s" : ""} found
         </p>
+        
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <button 
+            onClick={handleReset} 
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Reset
+          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)} 
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+            >
+              <span>
+                Sort by: <span className="font-semibold">{sortOptions[sortCriteria]}</span>
+              </span>
+              <ChevronDown className="h-4 w-4" />
+            </button>
+            {isSortDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                <div className="py-1">
+                  {Object.entries(sortOptions).map(([key, value]) => (
+                    <button 
+                      key={key} 
+                      onClick={() => {
+                        setSortCriteria(key);
+                        setIsSortDropdownOpen(false);
+                      }} 
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+                    >
+                      {value}
+                      {sortCriteria === key && <Check className="h-4 w-4 text-blue-600" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-4 mt-4 pr-1">
-        {visibleItineraries.map((itinerary, idx) => (
-          <div
-            key={idx}
-            onClick={() => onRouteSelect && onRouteSelect(idx)}
-            className={`border rounded-2xl shadow-sm bg-white hover:shadow-md transition-all duration-200 cursor-pointer ${selectedRouteIndex === idx
-                ? "border-blue-400 ring-2 ring-blue-100 bg-blue-50"
-                : "border-gray-200 hover:border-gray-300"
+        {visibleItineraries.map((itinerary, idx) => {
+          const originalIndex = itineraries.findIndex(orig => orig === itinerary);
+          
+          return (
+            <div
+              key={idx}
+              onClick={() => onRouteSelect && onRouteSelect(originalIndex)}
+              className={`border rounded-2xl shadow-sm bg-white hover:shadow-md transition-all duration-200 cursor-pointer ${
+                selectedRouteIndex === originalIndex
+                  ? "border-blue-400 ring-2 ring-blue-100 bg-blue-50"
+                  : "border-gray-200 hover:border-gray-300"
               }`}
-          >
-            <div className="p-5">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="font-semibold text-gray-800 text-lg">
-                    Route {idx + 1}
-                    {selectedRouteIndex === idx && (
-                      <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
-                        Selected
+            >
+              <div className="p-5">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="font-semibold text-gray-800 text-lg">
+                      Route {idx + 1}
+                      {selectedRouteIndex === originalIndex && (
+                        <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
+                          Selected
+                        </span>
+                      )}
+                    </p>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
+                      <Clock className="h-4 w-4" />
+                      <span>
+                        {formatTime(itinerary.startTime)} → {formatTime(itinerary.endTime)}
                       </span>
-                    )}
-                  </p>
-                  <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
-                    <Clock className="h-4 w-4" />
-                    <span>
-                      {formatTime(itinerary.startTime)} → {formatTime(itinerary.endTime)}
-                    </span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {(() => {
+                        const transfers = (itinerary.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1;
+                        return transfers > 0 ? `${transfers} transfer${transfers > 1 ? 's' : ''}` : 'Direct';
+                      })()}
+                    </div>
+                  </div>
+                  <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                    {formatDuration(itinerary.duration)}
                   </div>
                 </div>
-                <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                  {formatDuration(itinerary.duration)}
+
+                <div className="space-y-3">
+                  {Array.isArray(itinerary.legs) &&
+                    itinerary.legs.map((leg, lidx) => (
+                      <JourneyLeg key={lidx} leg={leg} />
+                    ))}
                 </div>
               </div>
-
-              <div className="space-y-3">
-                {Array.isArray(itinerary.legs) &&
-                  itinerary.legs.map((leg, lidx) => (
-                    <JourneyLeg key={lidx} leg={leg} />
-                  ))}
-              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
-        {!showAll && itineraries.length > 3 && (
+        {!showAll && sortedItineraries.length > 3 && (
           <button
             onClick={() => setShowAll(true)}
             className="w-full py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors font-medium"
           >
-            Show {itineraries.length - 3} More Routes
+            Show {sortedItineraries.length - 3} More Routes
           </button>
         )}
       </div>
