@@ -46,7 +46,8 @@ const JourneyList = ({
         case 'transfers-asc':
           const transfersA = (a.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1;
           const transfersB = (b.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1;
-          return Math.max(0, transfersA) - Math.max(0, transfersB);
+          const transferDiff = Math.max(0, transfersA) - Math.max(0, transfersB);
+          return transferDiff !== 0 ? transferDiff : (a.duration || 0) - (b.duration || 0);
         case 'recommended':
         default:
           const scoreA = (a.duration || 0) / 60 + ((a.legs || []).filter(leg => leg.mode === 'RAIL' || leg.mode === 'BUS').length - 1) * 5;
