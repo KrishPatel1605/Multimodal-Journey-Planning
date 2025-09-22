@@ -1,5 +1,7 @@
 import { getOTPRoute } from "../services/otpService.js";
 import { calculateFare } from "../services/fareService.js";
+import { calculateTrainFare } from "../services/trainFareService.js";
+import { calculateBusFare } from "../services/busFareService.js";
 
 export const getRoutes = async (req, res) => {
   try {
@@ -14,7 +16,6 @@ export const getRoutes = async (req, res) => {
     const otpResponse = await getOTPRoute(start, destination, transportModes);
 
     const processedRoutes = otpResponse.plan.itineraries.map((itinerary) => {
-
       itinerary.legs = itinerary.legs.map((leg) => {
         if (leg.mode === "WALK" && leg.distance > 750) {
           const uber = calculateFare(
@@ -31,6 +32,23 @@ export const getRoutes = async (req, res) => {
           leg.distance = uber.distance;
           leg.duration = uber.duration;
         }
+
+        if (leg.mode === "RAIL") {
+          const trainFare = calculateTrainFare(leg.distance / 1000);
+          leg.fares = {
+            secondClass: trainFare.secondClass,
+            firstClass: trainFare.firstClass,
+          };
+        }
+
+        if (leg.mode === "BUS") {
+          const busFare = calculateBusFare(leg.distance / 1000);
+          leg.fares = {
+            nonAC: busFare.nonAC,
+            ac: busFare.ac,
+          };
+        }
+
         return leg;
       });
 
