@@ -1,6 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { Clock, MapPin, Loader2, AlertCircle, ChevronDown, Check, Search, IndianRupee } from "lucide-react";
 
+// Storage keys
+const STORAGE_KEYS = {
+  SORT_CRITERIA: 'mumbai_transit_sort_criteria',
+};
+
+// Helper functions for localStorage
+const saveToStorage = (key, value) => {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+  } catch (error) {
+    console.warn('Failed to save to localStorage:', error);
+  }
+};
+
+const loadFromStorage = (key, defaultValue) => {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : defaultValue;
+    }
+  } catch (error) {
+    console.warn('Failed to load from localStorage:', error);
+  }
+  return defaultValue;
+};
+
 const formatTime = (ms) => {
   if (!ms) return "--";
   const d = new Date(ms);
@@ -50,9 +78,18 @@ const JourneyList = ({
   hasSearched = false
 }) => {
   const [showAll, setShowAll] = useState(false);
-  const [sortCriteria, setSortCriteria] = useState('recommended');
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [sortedItineraries, setSortedItineraries] = useState([]);
+
+  // Load sort criteria from localStorage on component mount
+  const [sortCriteria, setSortCriteria] = useState(() => {
+    return loadFromStorage(STORAGE_KEYS.SORT_CRITERIA, 'recommended');
+  });
+
+  // Save sort criteria to localStorage whenever it changes
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.SORT_CRITERIA, sortCriteria);
+  }, [sortCriteria]);
 
   const sortOptions = {
     'recommended': 'Recommended',
@@ -93,6 +130,11 @@ const JourneyList = ({
 
   const handleReset = () => {
     setSortCriteria('recommended');
+  };
+
+  const handleSortChange = (newSortCriteria) => {
+    setSortCriteria(newSortCriteria);
+    setIsSortDropdownOpen(false);
   };
 
   if (loading) {
@@ -176,10 +218,7 @@ const JourneyList = ({
                   {Object.entries(sortOptions).map(([key, value]) => (
                     <button
                       key={key}
-                      onClick={() => {
-                        setSortCriteria(key);
-                        setIsSortDropdownOpen(false);
-                      }}
+                      onClick={() => handleSortChange(key)}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between"
                     >
                       {value}

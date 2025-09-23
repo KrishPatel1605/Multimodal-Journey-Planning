@@ -4,6 +4,34 @@ import { ArrowUpDown, Navigation, Loader2, MapPin, Train, Bus, Check } from "luc
 const startIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2hmPSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMzNEQzOUUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTBjMCA3LTkgMTMtOSAxM3MtOS02LTktMTNhOSw5IDAgMCAxIDE4LDB6Ij48L3BhdGg+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMCIgcj0iMyIgZmlsbD0iIzM0RDM5RSI+PC9jaXJjbGU+PC9zdmc+";
 const endIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2hmPSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNFRjQ0NDQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTBjMCA3LTkgMTMtOSAxM3MtOS02LTktMTNhOSw5IDAgMCAxIDE4LDB6Ij48L3BhdGg+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMCIgcj0iMyIgZmlsbD0iI0VGNDQ0NCI+PC9jaXJjbGU+PC9zdmc+";
 
+// Storage keys
+const STORAGE_KEYS = {
+  TRANSPORT_MODES: 'mumbai_transit_transport_modes',
+};
+
+// Helper functions for localStorage
+const saveToStorage = (key, value) => {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+  } catch (error) {
+    console.warn('Failed to save to localStorage:', error);
+  }
+};
+
+const loadFromStorage = (key, defaultValue) => {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : defaultValue;
+    }
+  } catch (error) {
+    console.warn('Failed to load from localStorage:', error);
+  }
+  return defaultValue;
+};
+
 export default function InputLayout({ onSearch, loading }) {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -13,10 +41,18 @@ export default function InputLayout({ onSearch, loading }) {
   const [selectedTo, setSelectedTo] = useState(null);
   const [gettingLocation, setGettingLocation] = useState(false);
   
-  const [transportModes, setTransportModes] = useState({
-    rail: true,
-    bus: true
+  // Load transport modes from localStorage on component mount
+  const [transportModes, setTransportModes] = useState(() => {
+    return loadFromStorage(STORAGE_KEYS.TRANSPORT_MODES, {
+      rail: true,
+      bus: true
+    });
   });
+
+  // Save transport modes to localStorage whenever they change
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.TRANSPORT_MODES, transportModes);
+  }, [transportModes]);
 
   const fetchSuggestions = async (query, setFn) => {
     if (query.length < 3) {
