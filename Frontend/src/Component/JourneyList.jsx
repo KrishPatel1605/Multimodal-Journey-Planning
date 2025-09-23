@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Clock, MapPin, Loader2, AlertCircle, ChevronDown, Check, Search, IndianRupee } from "lucide-react";
 
-// Storage keys
 const STORAGE_KEYS = {
   SORT_CRITERIA: 'mumbai_transit_sort_criteria',
 };
 
-// Helper functions for localStorage
 const saveToStorage = (key, value) => {
   try {
     if (typeof localStorage !== 'undefined') {
@@ -81,12 +79,10 @@ const JourneyList = ({
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [sortedItineraries, setSortedItineraries] = useState([]);
 
-  // Load sort criteria from localStorage on component mount
   const [sortCriteria, setSortCriteria] = useState(() => {
     return loadFromStorage(STORAGE_KEYS.SORT_CRITERIA, 'recommended');
   });
 
-  // Save sort criteria to localStorage whenever it changes
   useEffect(() => {
     saveToStorage(STORAGE_KEYS.SORT_CRITERIA, sortCriteria);
   }, [sortCriteria]);
