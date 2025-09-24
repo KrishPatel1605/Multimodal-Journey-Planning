@@ -43,38 +43,62 @@ const formatDuration = (seconds) => {
     return `${mins} min`;
 };
 
+// Check if bus is AC based on headsign
+const isACBus = (leg) => {
+    return leg.mode === "BUS" && leg.headsign && leg.headsign.startsWith("A-");
+};
+
+// Format bus headsign to remove text after integers
+const formatBusHeadsign = (headsign) => {
+    if (!headsign) return headsign;
+    
+    // Find the first integer in the headsign
+    const match = headsign.match(/\d+/);
+    if (match) {
+        const integerIndex = match.index + match[0].length;
+        return headsign.substring(0, integerIndex);
+    }
+    
+    return headsign;
+};
+
 // Calculate total fare for an itinerary
 const calculateTotalFare = (itinerary) => {
     if (!itinerary || !itinerary.legs) return { min: 0, max: 0 };
 
-    let minTotal = 0;
-    let maxTotal = 0;
+    let total = 0;
 
     itinerary.legs.forEach(leg => {
         if (leg.fares) {
-            if (leg.mode === "RAIL" && leg.fares.secondClass && leg.fares.firstClass) {
-                minTotal += leg.fares.secondClass;
-                maxTotal += leg.fares.firstClass;
-            } else if (leg.mode === "BUS" && leg.fares.nonAC && leg.fares.ac) {
-                minTotal += leg.fares.nonAC;
-                maxTotal += leg.fares.ac;
+            if (leg.mode === "RAIL" && leg.fares.secondClass) {
+                // Use second class fare for rail
+                total += leg.fares.secondClass;
+            } else if (leg.mode === "BUS") {
+                if (isACBus(leg) && leg.fares.ac) {
+                    // AC bus - use only AC fare
+                    total += leg.fares.ac;
+                } else if (!isACBus(leg) && leg.fares.nonAC) {
+                    // Non-AC bus - use only non-AC fare
+                    total += leg.fares.nonAC;
+                }
             } else if (leg.mode === "UBER" && leg.fares) {
                 const uberFares = [leg.fares.auto, leg.fares.car, leg.fares.moto].filter(Boolean);
                 if (uberFares.length > 0) {
-                    minTotal += Math.min(...uberFares);
-                    maxTotal += Math.max(...uberFares);
+                    total += Math.min(...uberFares);
                 }
             }
         }
     });
 
-    return { min: minTotal, max: maxTotal };
+    return { min: total, max: total };
 };
 
 // --- CHILD COMPONENTS ---
 
 const LegDetails = ({ leg }) => {
     if (!leg) return null;
+
+    const isAC = isACBus(leg);
 
     return (
         <div className="text-sm text-gray-700 bg-white">
@@ -95,9 +119,14 @@ const LegDetails = ({ leg }) => {
                 )}
                 
                 {leg.mode === "BUS" && leg.headsign && (
-                    <p className="text-sm text-gray-700 bg-blue-50 px-3 py-2 rounded-lg">
-                        <span className="font-medium text-blue-800">Towards:</span> {leg.headsign}
-                    </p>
+                    <div className="text-sm text-gray-700 bg-blue-50 px-3 py-2 rounded-lg">
+                        <span className="font-medium text-blue-800">Towards:</span> {formatBusHeadsign(leg.headsign)}
+                        {isAC && (
+                            <span className="ml-2 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">
+                                AC Bus
+                            </span>
+                        )}
+                    </div>
                 )}
                 
                 {leg.mode === "WALK" && Array.isArray(leg.steps) && (
@@ -135,17 +164,28 @@ const LegDetails = ({ leg }) => {
 
                 {leg.mode === "BUS" && leg.fares && (
                      <div className="mt-4">
-                        <p className="font-semibold text-gray-800 mb-2">Bus Fares:</p>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div className="bg-gray-100 p-2 rounded-lg text-center">
-                                <p className="font-medium">Non-AC</p>
-                                <p className="text-green-600 flex items-center justify-center gap-1 font-semibold"><IndianRupee className="h-3 w-3" />{leg.fares.nonAC}</p>
+                        <p className="font-semibold text-gray-800 mb-2">Bus Fare:</p>
+                        {isAC ? (
+                            // AC Bus - show only AC fare
+                            <div className="text-xs">
+                                <div className="bg-green-100 p-3 rounded-lg text-center border border-green-200">
+                                    <p className="font-medium text-green-800">AC Bus</p>
+                                    <p className="text-green-600 flex items-center justify-center gap-1 font-semibold text-lg mt-1">
+                                        <IndianRupee className="h-4 w-4" />{leg.fares.ac}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="bg-gray-100 p-2 rounded-lg text-center">
-                                <p className="font-medium">AC</p>
-                                <p className="text-green-600 flex items-center justify-center gap-1 font-semibold"><IndianRupee className="h-3 w-3" />{leg.fares.ac}</p>
+                        ) : (
+                            // Non-AC Bus - show only non-AC fare
+                            <div className="text-xs">
+                                <div className="bg-gray-100 p-3 rounded-lg text-center border border-gray-200">
+                                    <p className="font-medium text-gray-800">Non-AC Bus</p>
+                                    <p className="text-green-600 flex items-center justify-center gap-1 font-semibold text-lg mt-1">
+                                        <IndianRupee className="h-4 w-4" />{leg.fares.nonAC}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 )}
 
@@ -195,22 +235,32 @@ const JourneyCard = ({ itinerary, isSelected, onSelect }) => {
     const startLocation = itinerary.legs[0]?.from?.name || 'Start';
     const endLocation = itinerary.legs[itinerary.legs.length - 1]?.to?.name || 'Destination';
 
-    const getModeStyle = (mode) => {
-        const styles = {
+    const getModeStyle = (mode, leg) => {
+        const baseStyles = {
             UBER: { bg: "bg-black", text: "text-white", icon: "🚕" },
             RAIL: { bg: "bg-blue-600", text: "text-white", icon: "🚆" },
             BUS: { bg: "bg-emerald-500", text: "text-white", icon: "🚌" },
             WALK: { bg: "bg-gray-600", text: "text-white", icon: "🚶" },
             DEFAULT: { bg: "bg-gray-700", text: "text-white", icon: "📍" },
         };
-        return styles[mode] || styles.DEFAULT;
+        
+        let style = baseStyles[mode] || baseStyles.DEFAULT;
+        
+        // Special styling for AC buses
+        if (mode === "BUS" && isACBus(leg)) {
+            style = { ...style, bg: "bg-gradient-to-br from-emerald-500 to-emerald-600" };
+        }
+        
+        return style;
     };
 
     const getMinLegFare = (leg) => {
         if (!leg.fares) return null;
         switch (leg.mode) {
             case "RAIL": return leg.fares.secondClass;
-            case "BUS": return leg.fares.nonAC;
+            case "BUS": 
+                // For AC buses, use AC fare; for non-AC buses, use non-AC fare
+                return isACBus(leg) ? leg.fares.ac : leg.fares.nonAC;
             case "UBER":
                 const uberFares = [leg.fares.auto, leg.fares.car, leg.fares.moto].filter(Boolean);
                 return uberFares.length > 0 ? Math.min(...uberFares) : null;
@@ -250,7 +300,7 @@ const JourneyCard = ({ itinerary, isSelected, onSelect }) => {
                         {totalFare.min > 0 && (
                             <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
                                 <IndianRupee className="h-4 w-4" />
-                                <span>{`${totalFare.min}`}</span>
+                                <span>{totalFare.min}</span>
                             </div>
                         )}
                     </div>
@@ -258,15 +308,21 @@ const JourneyCard = ({ itinerary, isSelected, onSelect }) => {
 
                 <div className="flex items-center">
                     {itinerary.legs.map((leg, index) => {
-                        const style = getModeStyle(leg.mode);
+                        const style = getModeStyle(leg.mode, leg);
                         const minFare = getMinLegFare(leg);
 
                         return (
                             <React.Fragment key={index}>
                                 <button
                                     onClick={(e) => handleLegClick(e, index)}
-                                    className={`flex-shrink-0 rounded-lg transition-all duration-300 ${style.bg} ${expandedLegIndex === index ? 'ring-2 ring-offset-2 ring-blue-500 shadow-lg' : 'shadow-sm'} w-20 h-28 flex flex-col overflow-hidden`}
+                                    className={`flex-shrink-0 rounded-lg transition-all duration-300 ${style.bg} ${expandedLegIndex === index ? 'ring-2 ring-offset-2 ring-blue-500 shadow-lg' : 'shadow-sm'} w-20 h-28 flex flex-col overflow-hidden relative`}
                                 >
+                                    {/* AC indicator for AC buses */}
+                                    {isACBus(leg) && (
+                                        <div className="absolute top-1 right-1 bg-white/90 text-emerald-700 text-xs font-bold px-1 py-0.5 rounded">
+                                            AC
+                                        </div>
+                                    )}
                                     <div className={`flex-grow flex flex-col justify-center items-center p-1 text-center ${style.text}`}>
                                         <span className="text-3xl">{style.icon}</span>
                                         <p className="font-bold text-sm mt-1">{leg.mode}</p>
