@@ -94,6 +94,12 @@ const LegDetails = ({ leg }) => {
                     <p className="italic text-gray-500">Route: {leg.route}</p>
                 )}
                 
+                {leg.mode === "BUS" && leg.headsign && (
+                    <p className="text-sm text-gray-700 bg-blue-50 px-3 py-2 rounded-lg">
+                        <span className="font-medium text-blue-800">Towards:</span> {leg.headsign}
+                    </p>
+                )}
+                
                 {leg.mode === "WALK" && Array.isArray(leg.steps) && (
                     <div className="mt-4">
                         <p className="font-semibold text-gray-800 mb-2">Walking Directions:</p>
@@ -487,4 +493,3 @@ const JourneyList = ({
 
 
 export default JourneyList;
-
