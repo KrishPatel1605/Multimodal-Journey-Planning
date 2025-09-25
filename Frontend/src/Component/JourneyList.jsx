@@ -135,17 +135,33 @@ const LegDetails = ({ leg }) => {
 
                 {leg.mode === "RAIL" && (
                     <div className="mt-4 space-y-2">
+                        {leg.tripShortName && (
+                            <div className="bg-blue-50 px-3 py-2 rounded-lg text-sm">
+                                <span className="font-medium text-blue-800">Train:</span>{" "}
+                                <span className="ml-1 font-semibold">{leg.tripShortName}</span>
+                                {isTrainFast(leg) && (
+                                    <span className="ml-2 bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-semibold">
+                                        Fast
+                                    </span>
+                                )}
+                            </div>
+                        )}
+
                         {leg.fares && (
                             <div className="mt-3">
                                 <p className="font-semibold text-gray-800 mb-2">Train Fares:</p>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
                                     <div className="bg-gray-100 p-2 rounded-lg text-center">
                                         <p className="font-medium">Second Class</p>
-                                        <p className="text-green-600 flex items-center justify-center gap-1 font-semibold"><IndianRupee className="h-3 w-3" />{leg.fares.secondClass}</p>
+                                        <p className="text-green-600 flex items-center justify-center gap-1 font-semibold">
+                                            <IndianRupee className="h-3 w-3" />{leg.fares.secondClass}
+                                        </p>
                                     </div>
                                     <div className="bg-gray-100 p-2 rounded-lg text-center">
                                         <p className="font-medium">First Class</p>
-                                        <p className="text-green-600 flex items-center justify-center gap-1 font-semibold"><IndianRupee className="h-3 w-3" />{leg.fares.firstClass}</p>
+                                        <p className="text-green-600 flex items-center justify-center gap-1 font-semibold">
+                                            <IndianRupee className="h-3 w-3" />{leg.fares.firstClass}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
