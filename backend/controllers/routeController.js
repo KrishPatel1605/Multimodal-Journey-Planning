@@ -2,6 +2,7 @@ import { getOTPRoute } from "../services/otpService.js";
 import { calculateFare } from "../services/fareService.js";
 import { calculateTrainFare } from "../services/trainFareService.js";
 import { calculateBusFare } from "../services/busFareService.js";
+import { identifyTrainType } from "../services/trainTypeService.js";
 
 export const getRoutes = async (req, res) => {
   try {
@@ -39,6 +40,8 @@ export const getRoutes = async (req, res) => {
             secondClass: trainFare.secondClass,
             firstClass: trainFare.firstClass,
           };
+
+          leg.trainType = identifyTrainType(leg);
         }
 
         if (leg.mode === "BUS") {
