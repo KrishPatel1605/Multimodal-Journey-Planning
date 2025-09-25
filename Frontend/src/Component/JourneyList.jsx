@@ -43,15 +43,19 @@ const isACBus = (leg) => {
     return leg.mode === "BUS" && leg.headsign && leg.headsign.startsWith("A-");
 };
 
+const isTrainFast = (leg) => {
+    return leg.mode === "RAIL" && leg.trainType === "Fast";
+};
+
 const formatBusHeadsign = (headsign) => {
     if (!headsign) return headsign;
-    
+
     const match = headsign.match(/\d+/);
     if (match) {
         const integerIndex = match.index + match[0].length;
         return headsign.substring(0, integerIndex);
     }
-    
+
     return headsign;
 };
 
@@ -104,7 +108,7 @@ const LegDetails = ({ leg }) => {
                 {leg.route && leg.mode !== "RAIL" && (
                     <p className="italic text-gray-500">Route: {leg.route}</p>
                 )}
-                
+
                 {leg.mode === "BUS" && leg.headsign && (
                     <div className="text-sm text-gray-700 bg-blue-50 px-3 py-2 rounded-lg">
                         <span className="font-medium text-blue-800">Towards:</span> {formatBusHeadsign(leg.headsign)}
@@ -115,7 +119,7 @@ const LegDetails = ({ leg }) => {
                         )}
                     </div>
                 )}
-                
+
                 {leg.mode === "WALK" && Array.isArray(leg.steps) && (
                     <div className="mt-4">
                         <p className="font-semibold text-gray-800 mb-2">Walking Directions:</p>
@@ -130,7 +134,7 @@ const LegDetails = ({ leg }) => {
                 )}
 
                 {leg.mode === "RAIL" && (
-                     <div className="mt-4 space-y-2">
+                    <div className="mt-4 space-y-2">
                         {leg.fares && (
                             <div className="mt-3">
                                 <p className="font-semibold text-gray-800 mb-2">Train Fares:</p>
@@ -146,11 +150,11 @@ const LegDetails = ({ leg }) => {
                                 </div>
                             </div>
                         )}
-                     </div>
+                    </div>
                 )}
 
                 {leg.mode === "BUS" && leg.fares && (
-                     <div className="mt-4">
+                    <div className="mt-4">
                         <p className="font-semibold text-gray-800 mb-2">Bus Fare:</p>
                         {isAC ? (
                             <div className="text-xs">
@@ -185,7 +189,7 @@ const LegDetails = ({ leg }) => {
                                 </div>
                             )}
                             {leg.fares.car && (
-                                 <div className="bg-gray-100 p-2 rounded-lg text-center">
+                                <div className="bg-gray-100 p-2 rounded-lg text-center">
                                     <p className="font-medium">Car</p>
                                     <p className="text-green-600 flex items-center justify-center gap-1 font-semibold"><IndianRupee className="h-3 w-3" />{leg.fares.car}</p>
                                 </div>
@@ -231,13 +235,16 @@ const JourneyCard = ({ FromJL, ToJL, itinerary, isSelected, onSelect }) => {
             WALK: { bg: "bg-gray-600", text: "text-white", icon: "🚶" },
             DEFAULT: { bg: "bg-gray-700", text: "text-white", icon: "📍" },
         };
-        
+
         let style = baseStyles[mode] || baseStyles.DEFAULT;
-        
+
         if (mode === "BUS" && isACBus(leg)) {
             style = { ...style, bg: "bg-gradient-to-br from-emerald-500 to-emerald-600" };
         }
-        
+        if (mode === "RAIL" && isTrainFast(leg)) {
+            style = { ...style, bg: "bg-gradient-to-br from-blue-500 to-blue-600" };
+        }
+
         return style;
     };
 
@@ -245,7 +252,7 @@ const JourneyCard = ({ FromJL, ToJL, itinerary, isSelected, onSelect }) => {
         if (!leg.fares) return null;
         switch (leg.mode) {
             case "RAIL": return leg.fares.secondClass;
-            case "BUS": 
+            case "BUS":
                 return isACBus(leg) ? leg.fares.ac : leg.fares.nonAC;
             case "UBER":
                 const uberFares = [leg.fares.auto, leg.fares.car, leg.fares.moto].filter(Boolean);
@@ -253,7 +260,7 @@ const JourneyCard = ({ FromJL, ToJL, itinerary, isSelected, onSelect }) => {
             default: return null;
         }
     };
-    
+
     const handleLegClick = (e, index) => {
         e.stopPropagation();
         setExpandedLegIndex(prevIndex => prevIndex === index ? null : index);
@@ -262,17 +269,16 @@ const JourneyCard = ({ FromJL, ToJL, itinerary, isSelected, onSelect }) => {
     return (
         <div
             onClick={onSelect}
-            className={`border rounded-2xl shadow-sm bg-white hover:shadow-md transition-all duration-300 cursor-pointer ${
-                isSelected
-                    ? "border-blue-400 ring-2 ring-blue-100 bg-blue-50/50"
-                    : "border-gray-200 hover:border-gray-300"
-            }`}
+            className={`border rounded-2xl shadow-sm bg-white hover:shadow-md transition-all duration-300 cursor-pointer ${isSelected
+                ? "border-blue-400 ring-2 ring-blue-100 bg-blue-50/50"
+                : "border-gray-200 hover:border-gray-300"
+                }`}
         >
             <div className="p-4">
                 <div className="flex justify-between items-start mb-4">
                     <div className="max-w-[70%]">
                         <p className="font-bold text-gray-800 text-lg truncate" title={`${startLocation} → ${endLocation}`}>
-                           {startLocation} → {endLocation}
+                            {startLocation} → {endLocation}
                         </p>
                         <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
                             <Clock className="h-4 w-4" />
@@ -301,13 +307,20 @@ const JourneyCard = ({ FromJL, ToJL, itinerary, isSelected, onSelect }) => {
                             <React.Fragment key={index}>
                                 <button
                                     onClick={(e) => handleLegClick(e, index)}
-                                    className={`flex-shrink-0 rounded-lg transition-all duration-300 ${style.bg} ${expandedLegIndex === index ? 'ring-2 ring-offset-2 ring-blue-500 shadow-lg' : 'shadow-sm'} w-20 h-28 flex flex-col overflow-hidden relative`}
-                                >
-                                    {isACBus(leg) && (
-                                        <div className="absolute top-1 right-1 bg-white/90 text-emerald-700 text-xs font-bold px-1 py-0.5 rounded">
-                                            AC
-                                        </div>
-                                    )}
+                                    className={`flex-shrink-0 rounded-lg transition-all duration-300 ${style.bg} ${expandedLegIndex === index ? 'ring-2 ring-offset-2 ring-blue-500 shadow-lg' : 'shadow-sm'} w-20 h-28 flex flex-col overflow-hidden relative`}>
+                                    <div className="absolute top-1 right-1 flex flex-col gap-1">
+                                        {isACBus(leg) && (
+                                            <div className="bg-white/90 text-emerald-700 text-xs font-bold px-1 py-0.5 rounded">
+                                                AC
+                                            </div>
+                                        )}
+                                        {isTrainFast(leg) && (
+                                            <div className="bg-white/90 text-emerald-700 text-xs font-bold px-1 py-0.5 rounded">
+                                                Fast
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className={`flex-grow flex flex-col justify-center items-center p-1 text-center ${style.text}`}>
                                         <span className="text-3xl">{style.icon}</span>
                                         <p className="font-bold text-sm mt-1">{leg.mode}</p>
@@ -325,16 +338,16 @@ const JourneyCard = ({ FromJL, ToJL, itinerary, isSelected, onSelect }) => {
 
                                 {index < itinerary.legs.length - 1 && (
                                     <div className="px-2">
-                                      <ArrowRight className="h-6 w-6 text-gray-300" />
+                                        <ArrowRight className="h-6 w-6 text-gray-300" />
                                     </div>
                                 )}
                             </React.Fragment>
                         );
                     })}
                 </div>
-                
+
                 <div className={`transition-all ease-in-out duration-500 overflow-hidden ${expandedLegIndex !== null ? 'max-h-[500px] opacity-100 pt-4' : 'max-h-0 opacity-0'}`}>
-                   <LegDetails leg={itinerary.legs[expandedLegIndex]} />
+                    <LegDetails leg={itinerary.legs[expandedLegIndex]} />
                 </div>
             </div>
         </div>
@@ -437,7 +450,7 @@ const JourneyList = ({
             </div>
         );
     }
-    
+
     if (!sortedItineraries || sortedItineraries.length === 0) {
         return (
             <div className="w-full h-full flex items-center justify-center p-4">
@@ -476,13 +489,13 @@ const JourneyList = ({
                     >
                         Reset
                     </button>
-                     <div className="relative" ref={dropdownRef}>
+                    <div className="relative" ref={dropdownRef}>
                         <button
                             onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
                             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 flex items-center gap-2 shadow-sm"
                         >
                             <span>Sort by: <span className="font-semibold">{sortOptions[sortCriteria]}</span></span>
-                            <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isSortDropdownOpen ? 'rotate-180': ''}`} />
+                            <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
                         </button>
                         {isSortDropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 origin-top-right animate-scale-in">
@@ -508,14 +521,14 @@ const JourneyList = ({
                 {visibleItineraries.map((itinerary, idx) => {
                     const originalIndex = itineraries.findIndex(orig => orig === itinerary);
                     return (
-                       <JourneyCard 
-                            FromJL = {FromInput}
-                            ToJL = {ToInput}
+                        <JourneyCard
+                            FromJL={FromInput}
+                            ToJL={ToInput}
                             key={idx}
                             itinerary={itinerary}
                             isSelected={selectedRouteIndex === originalIndex}
                             onSelect={() => onRouteSelect && onRouteSelect(originalIndex)}
-                       />
+                        />
                     );
                 })}
 
