@@ -30,7 +30,7 @@ const loadFromStorage = (key, defaultValue) => {
     return defaultValue;
 };
 
-export default function InputLayout({ onSearch, loading }) {
+export default function InputLayout({ onSearch, loading, onFromUpdate, onToUpdate }) {
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
     const [fromSuggestions, setFromSuggestions] = useState([]);
@@ -277,6 +277,9 @@ export default function InputLayout({ onSearch, loading }) {
             },
             transportModes: transportModes,
         });
+
+        onFromUpdate(from)
+        onToUpdate(to)
     };
 
     const handleKeyDown = (e, field) => {

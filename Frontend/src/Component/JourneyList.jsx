@@ -210,15 +210,18 @@ const LegDetails = ({ leg }) => {
     );
 };
 
-const JourneyCard = ({ itinerary, isSelected, onSelect }) => {
+const JourneyCard = ({ FromJL, ToJL, itinerary, isSelected, onSelect }) => {
     const [expandedLegIndex, setExpandedLegIndex] = useState(null);
 
     if (!itinerary || !Array.isArray(itinerary.legs) || itinerary.legs.length === 0) return null;
 
     const totalFare = calculateTotalFare(itinerary);
 
-    const startLocation = itinerary.legs[0]?.from?.name || 'Start';
-    const endLocation = itinerary.legs[itinerary.legs.length - 1]?.to?.name || 'Destination';
+    const finalFrom = FromJL.split(',')[0].slice(0, 20);
+    const FinalTo = ToJL.split(',')[0].slice(0, 20);
+
+    const startLocation = finalFrom || 'Start';
+    const endLocation = FinalTo || 'Destination';
 
     const getModeStyle = (mode, leg) => {
         const baseStyles = {
@@ -339,6 +342,8 @@ const JourneyCard = ({ itinerary, isSelected, onSelect }) => {
 };
 
 const JourneyList = ({
+    FromInput,
+    ToInput,
     itineraries,
     loading,
     error,
@@ -504,6 +509,8 @@ const JourneyList = ({
                     const originalIndex = itineraries.findIndex(orig => orig === itinerary);
                     return (
                        <JourneyCard 
+                            FromJL = {FromInput}
+                            ToJL = {ToInput}
                             key={idx}
                             itinerary={itinerary}
                             isSelected={selectedRouteIndex === originalIndex}
