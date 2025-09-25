@@ -300,7 +300,7 @@ export default function InputLayout({ onSearch, loading }) {
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl p-6">
+    <div className="w-full bg-white rounded-2xl p-4 pb-0">
       <div className="relative">
         <div className="relative">
           <div className="flex items-center space-x-3">
@@ -387,7 +387,7 @@ export default function InputLayout({ onSearch, loading }) {
         </div>
       </div>
       
-      <div className="flex items-center justify-center gap-4 mb-6">
+      <div className="flex items-center justify-center gap-4 mb-4">
         <button 
           onClick={() => handleTransportModeChange('bus')}
           className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border rounded-full transition-colors relative ${

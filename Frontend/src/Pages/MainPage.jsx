@@ -73,8 +73,8 @@ const MainPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 p-6 font-sans">
-      <div className="flex flex-col h-full w-[60%] bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mr-6">
+    <div className="flex h-screen bg-gray-50 font-sans">
+      <div className="flex flex-col h-full w-[60%] bg-white shadow-lg border border-gray-100 overflow-hidden mr-6">
         <div className="p-3 border-b border-gray-200">
           <InputLayout onSearch={handleSearch} loading={loading} />
         </div>
