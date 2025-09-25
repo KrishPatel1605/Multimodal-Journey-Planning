@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Clock, MapPin, Loader2, AlertCircle, ChevronDown, Check, Search, IndianRupee, ArrowRight } from "lucide-react";
 
-// --- HELPER FUNCTIONS ---
-
-// Storage keys
 const STORAGE_KEYS = {
     SORT_CRITERIA: 'mumbai_transit_sort_criteria',
 };
 
-// Helper functions for localStorage
 const saveToStorage = (key, value) => {
     try {
         if (typeof localStorage !== 'undefined') {
@@ -43,16 +39,13 @@ const formatDuration = (seconds) => {
     return `${mins} min`;
 };
 
-// Check if bus is AC based on headsign
 const isACBus = (leg) => {
     return leg.mode === "BUS" && leg.headsign && leg.headsign.startsWith("A-");
 };
 
-// Format bus headsign to remove text after integers
 const formatBusHeadsign = (headsign) => {
     if (!headsign) return headsign;
     
-    // Find the first integer in the headsign
     const match = headsign.match(/\d+/);
     if (match) {
         const integerIndex = match.index + match[0].length;
@@ -62,7 +55,6 @@ const formatBusHeadsign = (headsign) => {
     return headsign;
 };
 
-// Calculate total fare for an itinerary
 const calculateTotalFare = (itinerary) => {
     if (!itinerary || !itinerary.legs) return { min: 0, max: 0 };
 
@@ -71,14 +63,11 @@ const calculateTotalFare = (itinerary) => {
     itinerary.legs.forEach(leg => {
         if (leg.fares) {
             if (leg.mode === "RAIL" && leg.fares.secondClass) {
-                // Use second class fare for rail
                 total += leg.fares.secondClass;
             } else if (leg.mode === "BUS") {
                 if (isACBus(leg) && leg.fares.ac) {
-                    // AC bus - use only AC fare
                     total += leg.fares.ac;
                 } else if (!isACBus(leg) && leg.fares.nonAC) {
-                    // Non-AC bus - use only non-AC fare
                     total += leg.fares.nonAC;
                 }
             } else if (leg.mode === "UBER" && leg.fares) {
@@ -92,8 +81,6 @@ const calculateTotalFare = (itinerary) => {
 
     return { min: total, max: total };
 };
-
-// --- CHILD COMPONENTS ---
 
 const LegDetails = ({ leg }) => {
     if (!leg) return null;
@@ -166,7 +153,6 @@ const LegDetails = ({ leg }) => {
                      <div className="mt-4">
                         <p className="font-semibold text-gray-800 mb-2">Bus Fare:</p>
                         {isAC ? (
-                            // AC Bus - show only AC fare
                             <div className="text-xs">
                                 <div className="bg-green-100 p-3 rounded-lg text-center border border-green-200">
                                     <p className="font-medium text-green-800">AC Bus</p>
@@ -176,7 +162,6 @@ const LegDetails = ({ leg }) => {
                                 </div>
                             </div>
                         ) : (
-                            // Non-AC Bus - show only non-AC fare
                             <div className="text-xs">
                                 <div className="bg-gray-100 p-3 rounded-lg text-center border border-gray-200">
                                     <p className="font-medium text-gray-800">Non-AC Bus</p>
@@ -246,7 +231,6 @@ const JourneyCard = ({ itinerary, isSelected, onSelect }) => {
         
         let style = baseStyles[mode] || baseStyles.DEFAULT;
         
-        // Special styling for AC buses
         if (mode === "BUS" && isACBus(leg)) {
             style = { ...style, bg: "bg-gradient-to-br from-emerald-500 to-emerald-600" };
         }
@@ -259,7 +243,6 @@ const JourneyCard = ({ itinerary, isSelected, onSelect }) => {
         switch (leg.mode) {
             case "RAIL": return leg.fares.secondClass;
             case "BUS": 
-                // For AC buses, use AC fare; for non-AC buses, use non-AC fare
                 return isACBus(leg) ? leg.fares.ac : leg.fares.nonAC;
             case "UBER":
                 const uberFares = [leg.fares.auto, leg.fares.car, leg.fares.moto].filter(Boolean);
@@ -317,7 +300,6 @@ const JourneyCard = ({ itinerary, isSelected, onSelect }) => {
                                     onClick={(e) => handleLegClick(e, index)}
                                     className={`flex-shrink-0 rounded-lg transition-all duration-300 ${style.bg} ${expandedLegIndex === index ? 'ring-2 ring-offset-2 ring-blue-500 shadow-lg' : 'shadow-sm'} w-20 h-28 flex flex-col overflow-hidden relative`}
                                 >
-                                    {/* AC indicator for AC buses */}
                                     {isACBus(leg) && (
                                         <div className="absolute top-1 right-1 bg-white/90 text-emerald-700 text-xs font-bold px-1 py-0.5 rounded">
                                             AC
@@ -356,9 +338,6 @@ const JourneyCard = ({ itinerary, isSelected, onSelect }) => {
     );
 };
 
-
-// --- MAIN COMPONENT ---
-
 const JourneyList = ({
     itineraries,
     loading,
@@ -378,7 +357,6 @@ const JourneyList = ({
         saveToStorage(STORAGE_KEYS.SORT_CRITERIA, sortCriteria);
     }, [sortCriteria]);
 
-    // Close dropdown on outside click
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

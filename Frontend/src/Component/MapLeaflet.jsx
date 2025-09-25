@@ -258,7 +258,7 @@ export default function MapLeaflet({
               color={line.color}
               weight={line.weight || 4}
               opacity={line.opacity || 0.8}
-              dashArray={line.mode === 'WALK' ? '5, 10' : undefined} // Dashed line for walking
+              dashArray={line.mode === 'WALK' ? '5, 10' : undefined}
             />
           ))}
 
