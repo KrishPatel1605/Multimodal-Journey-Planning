@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Clock, MapPin, Loader2, AlertCircle, ChevronDown, Check, Search, IndianRupee, ArrowRight } from "lucide-react";
+import travelIcon from '../images/travel3-Picsart-AiImageEnhancer.png'
 
 const STORAGE_KEYS = {
     SORT_CRITERIA: 'mumbai_transit_sort_criteria',
@@ -479,8 +480,8 @@ const JourneyList = ({
                         </>
                     ) : (
                         <>
-                            <MapPin className="h-10 w-10 mx-auto mb-4" />
-                            <p>Enter locations to find routes</p>
+                            <img src={travelIcon} className="h-80 w-auto mx-auto mb-4" />
+                            <p className="font-bold">Enter locations to find routes</p>
                         </>
                     )}
                 </div>
