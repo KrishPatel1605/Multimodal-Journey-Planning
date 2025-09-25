@@ -135,13 +135,17 @@ const LegDetails = ({ leg }) => {
 
                 {leg.mode === "RAIL" && (
                     <div className="mt-4 space-y-2">
-                        {leg.tripShortName && (
-                            <div className="bg-blue-50 px-3 py-2 rounded-lg text-sm">
-                                <span className="font-medium text-blue-800">Train:</span>{" "}
-                                <span className="ml-1 font-semibold">{leg.tripShortName}</span>
-                                {isTrainFast(leg) && (
+                        {(leg.tripShortName || leg.trainType) && (
+                            <div className="bg-blue-50 px-3 py-2 rounded-lg text-sm flex items-center justify-between">
+                                <div>
+                                    <span className="font-medium text-blue-800">Train:</span>{" "}
+                                    {leg.tripShortName && (
+                                        <span className="ml-1 font-semibold">{leg.tripShortName}</span>
+                                    )}
+                                </div>
+                                {leg.trainType && (
                                     <span className="ml-2 bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-semibold">
-                                        Fast
+                                        {leg.trainType}
                                     </span>
                                 )}
                             </div>
