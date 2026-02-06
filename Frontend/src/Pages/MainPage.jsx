@@ -106,7 +106,7 @@ const MainPage = () => {
         </div>
       </div>
 
-      <div className="w-[60%]">
+      <div className="w-[55%]">
         <JourneyList
           FromInput={from}
           ToInput={to}
