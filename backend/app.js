@@ -7,11 +7,15 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://optimized-journey-planning.vercel.app"
+    ],
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 app.use(bodyParser.json());
 app.use("/api/routes", routeRoutes);
